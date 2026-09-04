@@ -1,0 +1,24 @@
+# Environment & Secrets
+.env
+*.env
+
+# Python & Virtual Environments
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Flutter & Dart artifacts
+mobile-app/.dart_tool/
+mobile-app/.flutter-plugins
+mobile-app/.flutter-plugins-dependencies
+mobile-app/.packages
+mobile-app/build/
+mobile-app/.pub-cache/
+mobile-app/.pub/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
