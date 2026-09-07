@@ -1,12 +1,17 @@
-# Environment & Secrets
+# Environment variables
 .env
-*.env
+.env.*
 
-# Python & Virtual Environments
+# Python
 __pycache__/
-*.pyc
-.venv/
+*.py[cod]
+
+# Virtual environments
 venv/
+.venv/
+
+# FastAPI
+*.log
 env/
 
 # Flutter & Dart artifacts

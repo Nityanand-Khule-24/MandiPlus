@@ -1,0 +1,9 @@
+state,district,market,commodity,variety,grade,arrival_date,min_price,max_price,modal_price
+Maharashtra,Pune,Pune APMC,Onion,Local,FAQ,04/09/2026,1800,2400,2100
+Maharashtra,Pune,Pune APMC,Onion,Red,FAQ,04/09/2026,2000,2600,2300
+Maharashtra,Pune,Pune APMC,Tomato,Local,FAQ,04/09/2026,1200,1800,1500
+Maharashtra,Pune,Pune APMC,Potato,Local,FAQ,04/09/2026,1600,2200,1900
+Maharashtra,Nashik,Nashik APMC,Onion,Red,FAQ,04/09/2026,1900,2500,2200
+Maharashtra,Ahmednagar,Ahmednagar APMC,Onion,Local,FAQ,04/09/2026,1700,2300,2000
+Karnataka,Bangalore,Bangalore APMC,Tomato,Local,FAQ,04/09/2026,1000,1700,1400
+Maharashtra,Pune,Pune APMC,Cabbage,Local,FAQ,04/09/2026,800,1400,1100
