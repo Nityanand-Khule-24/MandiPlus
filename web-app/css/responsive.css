@@ -1,0 +1,416 @@
+/* =========================================================
+   MandiPlus — Responsive Design
+========================================================= */
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .hero-market-card {
+        max-width: 600px;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .trend-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .explorer-filters {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .explorer-button {
+        width: 100%;
+    }
+
+    .footer-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .container {
+        width: min(100% - 28px, var(--container-width));
+    }
+
+
+    /* Header */
+
+    .navbar {
+        min-height: 62px;
+    }
+
+    .desktop-nav,
+    .location-button {
+        display: none;
+    }
+
+    .mobile-menu-button {
+        display: block;
+    }
+
+
+    /* Mobile nav */
+
+    .mobile-nav {
+        display: none;
+
+        padding: 10px 14px 16px;
+
+        border-top: 1px solid var(--border);
+
+        background: white;
+    }
+
+    .mobile-nav.open {
+        display: grid;
+        gap: 4px;
+    }
+
+    .mobile-nav a {
+        padding: 11px 12px;
+
+        border-radius: 8px;
+
+        color: var(--text-secondary);
+
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .mobile-nav a:hover {
+        background: var(--green-light);
+        color: var(--primary);
+    }
+
+
+    /* Hero */
+
+    .hero-section {
+        padding: 48px 0 40px;
+    }
+
+    .hero-content h1 {
+        font-size: 42px;
+        letter-spacing: -1.5px;
+    }
+
+    .hero-description {
+        font-size: 15px;
+    }
+
+    .hero-search {
+        width: 100%;
+    }
+
+    .hero-search input {
+        font-size: 13px;
+    }
+
+    .search-button {
+        padding: 11px 13px;
+
+        font-size: 12px;
+    }
+
+    .hero-market-card {
+        padding: 22px;
+    }
+
+    .price-value {
+        font-size: 36px;
+    }
+
+
+    /* Sections */
+
+    .summary-section,
+    .prices-section,
+    .comparison-section,
+    .trend-section,
+    .explorer-section,
+    .location-section {
+        padding: 52px 0;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    /* Summary */
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Prices */
+
+    .price-table-wrapper {
+        display: none;
+    }
+
+    .mobile-price-list {
+        display: block;
+    }
+
+
+    /* Comparison */
+
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Trend */
+
+    .trend-stats {
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    .chart-card {
+        padding: 15px;
+    }
+
+    .chart-container {
+        height: 240px;
+    }
+
+
+    /* Explorer */
+
+    .explorer-filters {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Location */
+
+    .location-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .location-content {
+        align-items: flex-start;
+    }
+
+    .secondary-button {
+        width: 100%;
+    }
+
+
+    /* Footer */
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .container {
+        width: min(100% - 22px, var(--container-width));
+    }
+
+    .brand {
+        font-size: 19px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .hero-search {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    .hero-search input {
+        width: calc(100% - 50px);
+    }
+
+    .search-button {
+        width: 100%;
+    }
+
+    .popular-searches {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .summary-card {
+        padding: 16px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-brand {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .trend-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .trend-periods {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .trend-controls {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .filter-group select {
+        width: 100%;
+    }
+
+    .trend-periods {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .trend-period {
+        width: 100%;
+    }
+
+    .trend-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trend-chart-card {
+        padding: 16px;
+    }
+
+    .trend-chart-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .chart-wrapper {
+        height: 300px;
+    }
+}
+
+/* ============================================================
+   NEARBY MANDIS RESPONSIVE
+============================================================ */
+
+@media (max-width: 1000px) {
+
+    .nearby-mandis-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .nearby-section {
+        padding: 64px 0;
+    }
+
+    .nearby-mandis-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .nearby-mandi-card {
+        padding: 18px;
+        gap: 14px;
+    }
+
+    .nearby-mandi-info h3 {
+        font-size: 16px;
+    }
+
+    .nearby-price strong {
+        font-size: 19px;
+    }
+
+    .nearby-distance strong {
+        font-size: 14px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .nearby-mandi-card {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .nearby-rank {
+        flex: 0 0 36px;
+
+        width: 36px;
+        height: 36px;
+
+        font-size: 14px;
+    }
+
+    .nearby-mandi-info h3 {
+        font-size: 15px;
+    }
+
+    .nearby-mandi-info p {
+        font-size: 13px;
+    }
+
+    .nearby-price strong {
+        font-size: 18px;
+    }
+
+    .nearby-distance strong {
+        font-size: 13px;
+    }
+
+}

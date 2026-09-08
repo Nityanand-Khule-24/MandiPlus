@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="MandiPlus helps farmers and traders check today's mandi prices, compare markets, and understand agricultural price trends."
+    >
+
+    <title>MandiPlus — Mandi Prices & Market Intelligence</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONT
+    ====================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         MAIN CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/responsive.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER / NAVIGATION
+    ====================================================== -->
+
+    <header class="site-header">
+
+        <div class="container navbar">
+
+
+            <!-- Brand -->
+
+            <a
+                href="index.html"
+                class="brand"
+                aria-label="MandiPlus Home"
+            >
+
+                <span class="brand-icon">
+                    🌾
+                </span>
+
+                <span class="brand-text">
+                    Mandi<span>Plus</span>
+                </span>
+
+            </a>
+
+
+            <!-- Desktop Navigation -->
+
+            <nav
+                class="desktop-nav"
+                aria-label="Main navigation"
+            >
+
+                <a
+                    href="index.html"
+                    class="nav-link active"
+                >
+                    Home
+                </a>
+
+                <a
+                    href="pages/prices.html"
+                    class="nav-link"
+                >
+                    Prices
+                </a>
+
+                <a
+                    href="pages/markets.html"
+                    class="nav-link"
+                >
+                    Markets
+                </a>
+
+                <a
+                    href="pages/trends.html"
+                    class="nav-link"
+                >
+                    Trends
+                </a>
+
+                <a
+                    href="#search"
+                    class="nav-link"
+                >
+                    Search
+                </a>
+
+            </nav>
+
+
+            <!-- Location -->
+
+            <button
+                class="location-button"
+                id="locationButton"
+                type="button"
+                aria-label="Current location Pune Maharashtra"
+            >
+
+                <span>
+                    📍
+                </span>
+
+                <span>
+                    Pune, Maharashtra
+                </span>
+
+                <!-- <span class="location-arrow">
+                    ⌄
+                </span> -->
+
+            </button>
+
+
+            <!-- Mobile Menu -->
+
+            <button
+                class="mobile-menu-button"
+                id="mobileMenuButton"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+            >
+                ☰
+            </button>
+
+        </div>
+
+
+        <!-- Mobile Navigation -->
+
+        <nav
+            class="mobile-nav"
+            id="mobileNav"
+            aria-label="Mobile navigation"
+        >
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="pages/prices.html">
+                Prices
+            </a>
+
+            <a href="pages/markets.html">
+                Markets
+            </a>
+
+            <a href="pages/trends.html">
+                Trends
+            </a>
+
+            <a href="#search">
+                Search
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main>
+
+
+        <!-- =====================================================
+             HERO SECTION
+        ====================================================== -->
+
+        <section class="hero-section">
+
+            <div class="container hero-grid">
+
+
+                <!-- Hero Content -->
+
+                <div class="hero-content">
+
+
+                    <div class="eyebrow">
+
+                        <span class="live-dot"></span>
+
+                        Live Mandi Market Data
+
+                    </div>
+
+
+                    <h1>
+
+                        Know Your
+
+                        <span class="text-green">
+                            Mandi Price
+                        </span>
+
+                        Today.
+
+                    </h1>
+
+
+                    <p class="hero-description">
+
+                        Check today's agricultural prices,
+                        compare nearby mandis, and make
+                        better selling decisions.
+
+                    </p>
+
+
+                    <!-- Search -->
+
+                    <div
+                        class="hero-search"
+                        id="search"
+                    >
+
+                        <span
+                            class="search-icon"
+                            aria-hidden="true"
+                        >
+                            🔎
+                        </span>
+
+
+                        <input
+                            id="commoditySearchInput"
+                            type="search"
+                            placeholder="Search commodity e.g. Onion, Tomato, Potato..."
+                            autocomplete="off"
+                            list="commoditySuggestions"
+                        >
+
+                        <datalist id="commoditySuggestions"></datalist>
+
+
+                        <button
+                            id="clearSearchBtn"
+                            class="clear-search hidden"
+                            type="button"
+                            aria-label="Clear commodity search"
+                        >
+                            ×
+                        </button>
+
+
+                        <button
+                            id="searchButton"
+                            class="search-button"
+                            type="button"
+                        >
+                            Search
+                        </button>
+
+                    </div>
+
+
+                    <!-- Popular Commodities -->
+
+                    <div class="popular-searches">
+
+                        <span>
+                            Popular:
+                        </span>
+
+
+                        <button
+                            class="commodity-chip"
+                            data-commodity="Onion"
+                            type="button"
+                        >
+                            🧅 Onion
+                        </button>
+
+
+                        <button
+                            class="commodity-chip"
+                            data-commodity="Tomato"
+                            type="button"
+                        >
+                            🍅 Tomato
+                        </button>
+
+
+                        <button
+                            class="commodity-chip"
+                            data-commodity="Potato"
+                            type="button"
+                        >
+                            🥔 Potato
+                        </button>
+
+
+                        <button
+                            class="commodity-chip"
+                            data-commodity="Wheat"
+                            type="button"
+                        >
+                            🌾 Wheat
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Hero Market Card -->
+
+                <div class="hero-market-card">
+
+                    <div class="market-card-header">
+
+
+                        <div>
+
+                            <span class="card-label">
+                                Your Market
+                            </span>
+
+                            <h3>
+                                Pune APMC
+                            </h3>
+
+                        </div>
+
+
+                        <span class="market-status">
+
+                            <span class="status-dot"></span>
+
+                            Open
+
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="hero-price">
+
+                        <span class="price-label">
+                            Today's Market Range
+                        </span>
+
+
+                        <div class="price-value">
+
+                            ₹2,200
+
+                            <span>
+                                / quintal
+                            </span>
+
+                        </div>
+
+
+                        <div class="price-range">
+
+                            ₹1,900 — ₹2,500
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="price-movement positive">
+
+                        ↑ 4.8%
+
+                        <span>
+                            vs yesterday
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="market-card-footer">
+
+                        <span>
+                            🧅 Onion
+                        </span>
+
+                        <span>
+                            Updated today
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             MARKET SUMMARY
+        ====================================================== -->
+
+        <section class="summary-section">
+
+            <div class="container">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Market Overview
+                        </span>
+
+                        <h2>
+                            Today's Market Snapshot
+                        </h2>
+
+                    </div>
+
+
+                    <span class="data-updated">
+                        ● Live data
+                    </span>
+
+                </div>
+
+
+
+                <div class="summary-grid">
+
+
+                    <!-- Markets -->
+
+                    <article class="summary-card">
+
+                        <div class="summary-icon">
+                            🏪
+                        </div>
+
+
+                        <div>
+
+                            <span class="summary-label">
+                                Markets
+                            </span>
+
+
+                            <strong
+                                id="marketCount"
+                                class="summary-value"
+                            >
+                                —
+                            </strong>
+
+
+                            <span class="summary-meta">
+                                Markets reporting today
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <!-- Commodities -->
+
+                    <article class="summary-card">
+
+                        <div class="summary-icon">
+                            🌾
+                        </div>
+
+
+                        <div>
+
+                            <span class="summary-label">
+                                Commodities
+                            </span>
+
+
+                            <strong
+                                id="commodityCount"
+                                class="summary-value"
+                            >
+                                —
+                            </strong>
+
+
+                            <span class="summary-meta">
+                                Commodities tracked
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <!-- Latest Update -->
+
+                    <article class="summary-card">
+
+                        <div class="summary-icon">
+                            🕐
+                        </div>
+
+
+                        <div>
+
+                            <span class="summary-label">
+                                Latest Update
+                            </span>
+
+
+                            <strong
+                                id="latestUpdate"
+                                class="summary-value summary-text"
+                            >
+                                —
+                            </strong>
+
+
+                            <span class="summary-meta">
+                                Latest market report
+                            </span>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <!-- Price Movement -->
+
+                    <article class="summary-card">
+
+                        <div class="summary-icon">
+                            📈
+                        </div>
+
+
+                        <div>
+
+                            <span class="summary-label">
+                                Market Movement
+                            </span>
+
+
+                            <strong
+                                id="priceMovement"
+                                class="summary-value positive"
+                            >
+                                —
+                            </strong>
+
+
+                            <span class="summary-meta">
+                                Based on latest prices
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             TODAY'S PRICES
+        ====================================================== -->
+
+        <section class="prices-section">
+
+            <div class="container">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Today's Prices
+                        </span>
+
+
+                        <h2>
+                            Latest Mandi Rates
+                        </h2>
+
+
+                        <p>
+                            Current agricultural commodity
+                            prices from reporting markets.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="pages/prices.html"
+                        class="view-all-link"
+                    >
+                        View all prices →
+                    </a>
+
+                </div>
+
+
+
+                <!-- Price Filters -->
+
+                <div class="price-filters">
+
+
+                    <button
+                        class="filter-pill active"
+                        data-category="all"
+                        type="button"
+                    >
+                        All
+                    </button>
+
+
+                    <button
+                        class="filter-pill"
+                        data-category="vegetables"
+                        type="button"
+                    >
+                        Vegetables
+                    </button>
+
+
+                    <button
+                        class="filter-pill"
+                        data-category="grains"
+                        type="button"
+                    >
+                        Grains
+                    </button>
+
+
+                    <button
+                        class="filter-pill"
+                        data-category="pulses"
+                        type="button"
+                    >
+                        Pulses
+                    </button>
+
+
+                    <button
+                        class="filter-pill"
+                        data-category="spices"
+                        type="button"
+                    >
+                        Spices
+                    </button>
+
+                </div>
+
+
+
+                <!-- Desktop Price Table -->
+
+                <div class="price-table-wrapper">
+
+                    <table class="price-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Commodity
+                                </th>
+
+                                <th>
+                                    Mandi
+                                </th>
+
+                                <th>
+                                    Min Price
+                                </th>
+
+                                <th>
+                                    Max Price
+                                </th>
+
+                                <th>
+                                    Modal Price
+                                </th>
+
+                                <th>
+                                    Trend
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="pricesTableBody">
+
+                            <tr class="loading-row">
+
+                                <td colspan="6">
+
+                                    <div class="loading-state">
+                                        Loading latest mandi prices...
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+
+                <!-- Mobile Price Cards -->
+
+                <div
+                    class="mobile-price-list"
+                    id="mobilePriceList"
+                >
+
+                    <!-- API data inserted here -->
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             MARKET COMPARISON
+        ====================================================== -->
+
+        <section class="comparison-section">
+
+            <div class="container">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Compare Markets
+                        </span>
+
+
+                        <h2>
+                            Where Should You Sell Today?
+                        </h2>
+
+
+                        <p>
+                            Compare the same commodity across
+                            different markets.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div
+                    class="comparison-grid"
+                    id="comparisonGrid"
+                >
+
+
+                    <!-- Onion -->
+
+                    <article class="comparison-card">
+
+                        <div class="comparison-header">
+
+
+                            <div>
+
+                                <span class="commodity-name">
+                                    🧅 Onion
+                                </span>
+
+
+                                <span class="variety-name">
+                                    Nashik Red
+                                </span>
+
+                            </div>
+
+
+                            <span class="trend-badge positive">
+                                ↑ 4.8%
+                            </span>
+
+                        </div>
+
+
+
+                        <div class="market-comparison">
+
+
+                            <div class="market-row">
+
+                                <div>
+
+                                    <strong>
+                                        Pune APMC
+                                    </strong>
+
+                                    <span>
+                                        Pune
+                                    </span>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹2,200
+                                </strong>
+
+                            </div>
+
+
+
+                            <div class="market-row best-market">
+
+                                <div>
+
+                                    <strong>
+                                        Nashik APMC
+                                    </strong>
+
+                                    <span>
+                                        Nashik
+                                    </span>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹2,450
+                                </strong>
+
+
+                                <span class="best-label">
+                                    Best modal
+                                </span>
+
+                            </div>
+
+
+
+                            <div class="market-row">
+
+                                <div>
+
+                                    <strong>
+                                        Lasalgaon
+                                    </strong>
+
+                                    <span>
+                                        Nashik
+                                    </span>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹2,380
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <button
+                            class="compare-action-btn"
+                            data-crop-name="Onion"
+                            type="button"
+                        >
+                            Compare all Onion markets →
+                        </button>
+
+                    </article>
+
+
+
+                    <!-- Tomato -->
+
+                    <article class="comparison-card">
+
+                        <div class="comparison-header">
+
+
+                            <div>
+
+                                <span class="commodity-name">
+                                    🍅 Tomato
+                                </span>
+
+
+                                <span class="variety-name">
+                                    Local
+                                </span>
+
+                            </div>
+
+
+                            <span class="trend-badge negative">
+                                ↓ 2.1%
+                            </span>
+
+                        </div>
+
+
+
+                        <div class="market-comparison">
+
+
+                            <div class="market-row">
+
+                                <div>
+
+                                    <strong>
+                                        Pune APMC
+                                    </strong>
+
+                                    <span>
+                                        Pune
+                                    </span>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹1,800
+                                </strong>
+
+                            </div>
+
+
+
+                            <div class="market-row best-market">
+
+                                <div>
+
+                                    <strong>
+                                        Narayangaon
+                                    </strong>
+
+                                    <span>
+                                        Pune
+                                    </span>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹1,950
+                                </strong>
+
+
+                                <span class="best-label">
+                                    Best modal
+                                </span>
+
+                            </div>
+
+
+
+                            <div class="market-row">
+
+                                <div>
+
+                                    <strong>
+                                        Junnar
+                                    </strong>
+
+                                    <span>
+                                        Pune
+                                    </span>
+
+                                </div>
+
+
+                                <strong>
+                                    ₹1,875
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <button
+                            class="compare-action-btn"
+                            data-crop-name="Tomato"
+                            type="button"
+                        >
+                            Compare all Tomato markets →
+                        </button>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             PRICE TRENDS
+        ====================================================== -->
+
+        <section
+            class="section trends-section trend-section"
+            id="trends"
+        >
+
+            <div class="container">
+
+
+                <!-- Section Heading -->
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            MARKET INTELLIGENCE
+                        </span>
+
+
+                        <h2>
+                            Price Trends
+                        </h2>
+
+
+                        <p>
+                            Track how mandi prices are moving
+                            over time.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TREND FILTERS
+                ================================================== -->
+
+                <div class="trend-controls">
+
+
+                    <!-- Commodity -->
+
+                    <div class="filter-group">
+
+                        <label for="trendCommodity">
+                            Commodity
+                        </label>
+
+
+                        <select id="trendCommodity">
+
+                            <option value="Onion">
+                                Onion
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Market -->
+
+                    <div class="filter-group">
+
+                        <label for="trendMarket">
+                            Market
+                        </label>
+
+
+                        <select id="trendMarket">
+
+                            <option value="">
+                                All Markets
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Variety -->
+
+                    <div class="filter-group">
+
+                        <label for="trendVariety">
+                            Variety
+                        </label>
+
+
+                        <select id="trendVariety">
+
+                            <option value="">
+                                All Varieties
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Time Period -->
+
+                    <div class="trend-periods">
+
+
+                        <button
+                            class="trend-period active"
+                            data-days="7"
+                            type="button"
+                        >
+                            7 Days
+                        </button>
+
+
+                        <button
+                            class="trend-period"
+                            data-days="30"
+                            type="button"
+                        >
+                            30 Days
+                        </button>
+
+
+                        <button
+                            class="trend-period"
+                            data-days="90"
+                            type="button"
+                        >
+                            90 Days
+                        </button>
+
+
+                        <button
+                            class="trend-period"
+                            data-days="365"
+                            type="button"
+                        >
+                            1 Year
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TREND SUMMARY
+                ================================================== -->
+
+                <div class="trend-summary-grid">
+
+
+                    <!-- Current Modal -->
+
+                    <div class="trend-stat-card">
+
+                        <span>
+                            Current Modal Price
+                        </span>
+
+
+                        <strong id="trendCurrentPrice">
+                            —
+                        </strong>
+
+
+                        <small id="trendCurrentDate">
+                            —
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- Price Change -->
+
+                    <div class="trend-stat-card">
+
+                        <span>
+                            Price Change
+                        </span>
+
+
+                        <strong id="trendPriceChange">
+                            —
+                        </strong>
+
+
+                        <small id="trendDirection">
+                            —
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- Minimum -->
+
+                    <div class="trend-stat-card">
+
+                        <span>
+                            Minimum Price
+                        </span>
+
+
+                        <strong id="trendMinPrice">
+                            —
+                        </strong>
+
+
+                        <small>
+                            Selected period
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- Maximum -->
+
+                    <div class="trend-stat-card">
+
+                        <span>
+                            Maximum Price
+                        </span>
+
+
+                        <strong id="trendMaxPrice">
+                            —
+                        </strong>
+
+
+                        <small>
+                            Selected period
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TREND CHART
+                ================================================== -->
+
+                <div class="trend-chart-card">
+
+
+                    <div class="trend-chart-header">
+
+
+                        <div>
+
+                            <h3>
+                                Modal Price Movement
+                            </h3>
+
+
+                            <p id="trendChartSubtitle">
+                                Onion price movement across selected markets
+                            </p>
+
+                        </div>
+
+
+                        <span
+                            id="trendStatus"
+                            class="trend-status"
+                        >
+                            Loading...
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- Chart -->
+
+                    <div class="chart-wrapper">
+
+                        <canvas
+                            id="priceTrendChart"
+                            aria-label="Mandi price trend chart"
+                            role="img"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             MARKET EXPLORER
+        ====================================================== -->
+
+        <section class="explorer-section">
+
+            <div class="container">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Explore
+                        </span>
+
+
+                        <h2>
+                            Find a Mandi
+                        </h2>
+
+
+                        <p>
+                            Explore markets and discover
+                            where your commodity is trading.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="pages/markets.html"
+                        class="view-all-link"
+                    >
+                        Explore all markets →
+                    </a>
+
+                </div>
+
+
+
+                <div class="explorer-card">
+
+
+                    <div class="explorer-filters">
+
+
+                        <!-- State -->
+
+                        <div class="filter-group">
+
+                            <label for="stateFilter">
+                                State
+                            </label>
+
+
+                            <select id="stateFilter">
+
+                                <option value="">
+                                    Select state
+                                </option>
+
+
+                                <option
+                                    value="Maharashtra"
+                                    selected
+                                >
+                                    Maharashtra
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- District -->
+
+                        <div class="filter-group">
+
+                            <label for="districtFilter">
+                                District
+                            </label>
+
+
+                            <select id="districtFilter">
+
+                                <option value="">
+                                    Select district
+                                </option>
+
+
+                                <option value="Pune">
+                                    Pune
+                                </option>
+
+
+                                <option value="Nashik">
+                                    Nashik
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- Commodity -->
+
+                        <div class="filter-group">
+
+                            <label for="commodityFilter">
+                                Commodity
+                            </label>
+
+
+                            <select id="commodityFilter">
+
+                                <option value="">
+                                    Select commodity
+                                </option>
+
+
+                                <option value="Onion">
+                                    Onion
+                                </option>
+
+
+                                <option value="Tomato">
+                                    Tomato
+                                </option>
+
+
+                                <option value="Potato">
+                                    Potato
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- Search Button -->
+
+                        <button
+                            class="primary-button explorer-button"
+                            id="exploreMarketsButton"
+                            type="button"
+                        >
+                            Find Markets
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- Market Results -->
+
+                    <div
+                        class="market-results"
+                        id="marketResults"
+                    >
+
+                        <div class="market-result">
+
+                            <div class="market-result-icon">
+                                🏪
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Pune APMC
+                                </strong>
+
+                                <span>
+                                    Pune, Maharashtra
+                                </span>
+
+                            </div>
+
+
+                            <div class="market-distance">
+                                Nearby
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="market-result">
+
+                            <div class="market-result-icon">
+                                🏪
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Pimpri Market
+                                </strong>
+
+                                <span>
+                                    Pune, Maharashtra
+                                </span>
+
+                            </div>
+
+
+                            <div class="market-distance">
+                                Nearby
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="market-result">
+
+                            <div class="market-result-icon">
+                                🏪
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Narayangaon APMC
+                                </strong>
+
+                                <span>
+                                    Pune, Maharashtra
+                                </span>
+
+                            </div>
+
+
+                            <div class="market-distance">
+                                Nearby
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             LOCATION SECTION
+        ====================================================== -->
+
+        <section class="location-section">
+
+    <div class="container location-card">
+
+        <div class="location-content">
+
+            <span class="location-icon">
+                📍
+            </span>
+
+            <div>
+
+                <span class="section-kicker">
+                    Your Location
+                </span>
+
+                <h2>
+                    Get prices near you
+                </h2>
+
+                <p>
+                    Set your location to see nearby
+                    markets and relevant mandi prices.
+                </p>
+
+            </div>
+
+        </div>
+
+        <button
+            id="changeLocationButton"
+            class="secondary-button"
+            type="button"
+        >
+            Change Location
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NEARBY MANDIS
+====================================================== -->
+
+<section class="nearby-section" id="nearby">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-kicker">
+                    LOCATION INTELLIGENCE
+                </span>
+
+                <h2>
+    Nearby <span id="nearbyCommodityName">Onion</span> Mandis
+</h2>
+
+                <p>
+                    Find agricultural markets closest to your location.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="nearbyMandis"
+            class="nearby-mandis-grid"
+        >
+
+            <div class="nearby-empty">
+
+                <div class="nearby-empty-icon">
+                    📍
+                </div>
+
+                <h3>
+                    Find mandis near you
+                </h3>
+
+                <p>
+                    Allow location access to discover nearby markets.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container footer-grid">
+
+
+            <!-- Brand -->
+
+            <div class="footer-brand">
+
+
+                <a
+                    href="index.html"
+                    class="brand"
+                >
+
+                    <span class="brand-icon">
+                        🌾
+                    </span>
+
+
+                    <span class="brand-text">
+                        Mandi<span>Plus</span>
+                    </span>
+
+                </a>
+
+
+                <p>
+                    Agricultural market intelligence
+                    for better selling decisions.
+                </p>
+
+            </div>
+
+
+
+            <!-- Product -->
+
+            <div class="footer-column">
+
+                <h3>
+                    Product
+                </h3>
+
+
+                <a href="pages/prices.html">
+                    Mandi Prices
+                </a>
+
+
+                <a href="pages/markets.html">
+                    Market Explorer
+                </a>
+
+
+                <a href="pages/trends.html">
+                    Price Trends
+                </a>
+
+            </div>
+
+
+
+            <!-- Resources -->
+
+            <div class="footer-column">
+
+                <h3>
+                    Resources
+                </h3>
+
+
+                <a href="#">
+                    About MandiPlus
+                </a>
+
+
+                <a href="#">
+                    How It Works
+                </a>
+
+
+                <a href="#">
+                    Data Sources
+                </a>
+
+            </div>
+
+
+
+            <!-- Support -->
+
+            <div class="footer-column">
+
+                <h3>
+                    Support
+                </h3>
+
+
+                <a href="#">
+                    Help Center
+                </a>
+
+
+                <a href="#">
+                    Contact Us
+                </a>
+
+
+                <a href="#">
+                    Feedback
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Footer Bottom -->
+
+        <div class="container footer-bottom">
+
+            <span>
+                © 2026 MandiPlus. All rights reserved.
+            </span>
+
+
+            <span>
+                Market prices are indicative and may vary
+                by market and transaction.
+            </span>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT LIBRARIES
+    ====================================================== -->
+
+    <!-- Chart.js -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+
+
+    <!-- =====================================================
+         MANDIPLUS JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/api.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/explorer.js"></script>
+
+    <script src="js/trends.js"></script>
+
+    <script src="js/location.js"></script>
+
+    <script src="js/nearby.js"></script>
+
+    <!-- =====================================================
+         APPLICATION INITIALIZATION
+    ====================================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", async () => {
+
+    try {
+
+        console.info("[MandiPlus] Application starting...");
+
+        await window.MandiPlusDashboard.initialize();
+
+        await window.MandiPlusExplorer.initialize();
+
+        await window.MandiPlusTrends.initialize();
+
+        await window.MandiPlusLocation.initialize();
+
+        await window.MandiPlusNearby.initialize();
+
+        console.info(
+            "[MandiPlus] Application initialized successfully."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "[MandiPlus] Application initialization failed:",
+            error
+        );
+
+    }
+
+});
+
+    </script>
+
+</body>
+</html>

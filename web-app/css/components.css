@@ -1,0 +1,707 @@
+/* =========================================================
+   MandiPlus — Component States
+========================================================= */
+
+/* Loading */
+
+.is-loading {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+
+    background: #edf1ed;
+    border-radius: 6px;
+}
+
+.skeleton::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    transform: translateX(-100%);
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.6),
+            transparent
+        );
+
+    animation: skeleton-loading 1.4s infinite;
+}
+
+@keyframes skeleton-loading {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+
+/* Empty state */
+
+.empty-state {
+    padding: 45px 20px;
+
+    text-align: center;
+
+    color: var(--text-secondary);
+}
+
+.empty-state-icon {
+    margin-bottom: 10px;
+
+    font-size: 32px;
+}
+
+.empty-state h3 {
+    margin-bottom: 5px;
+
+    color: var(--text);
+    font-size: 16px;
+}
+
+.empty-state p {
+    font-size: 12px;
+}
+
+
+/* Error state */
+
+.error-state {
+    padding: 25px;
+
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+
+    background: var(--negative-light);
+
+    color: var(--negative);
+
+    text-align: center;
+}
+
+.error-state h3 {
+    margin-bottom: 4px;
+
+    font-size: 15px;
+}
+
+.error-state p {
+    font-size: 12px;
+}
+
+
+/* Toast */
+
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+
+    z-index: 2000;
+
+    padding: 12px 16px;
+
+    border-radius: 10px;
+
+    background: #17211b;
+    color: white;
+
+    box-shadow: var(--shadow-lg);
+
+    font-size: 12px;
+
+    animation: toast-in 0.25s ease;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Trend indicators */
+
+.trend-up {
+    color: var(--positive);
+}
+
+.trend-down {
+    color: var(--negative);
+}
+
+.trend-stable {
+    color: var(--neutral);
+}
+
+
+/* Price */
+
+.price-highlight {
+    font-weight: 800;
+}
+
+.modal-price {
+    color: var(--primary);
+    font-weight: 800;
+}
+
+
+/* Mobile price card */
+
+.mobile-price-card {
+    padding: 17px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    box-shadow: var(--shadow-sm);
+}
+
+.mobile-price-card + .mobile-price-card {
+    margin-top: 10px;
+}
+
+.mobile-price-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.mobile-price-commodity {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-price-commodity strong {
+    font-size: 14px;
+}
+
+.mobile-price-commodity span {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.mobile-price-values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 8px;
+
+    margin-top: 16px;
+    padding-top: 13px;
+
+    border-top: 1px solid var(--border);
+}
+
+.mobile-price-value {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-price-value span {
+    color: var(--text-muted);
+    font-size: 9px;
+    text-transform: uppercase;
+}
+
+.mobile-price-value strong {
+    font-size: 13px;
+}
+
+
+/* Active navigation */
+
+.mobile-nav a.active {
+    color: var(--primary);
+    background: var(--green-light);
+}
+
+/* =========================================
+   PRICE TRENDS
+   ========================================= */
+
+.trend-controls {
+    display: flex;
+    align-items: end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.filter-group select {
+    min-width: 170px;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--text-primary);
+    font: inherit;
+    cursor: pointer;
+}
+
+.trend-periods {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.trend-period {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-secondary);
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.trend-period:hover,
+.trend-period.active {
+    background: var(--primary-green);
+    color: white;
+    border-color: var(--primary-green);
+}
+
+.trend-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.trend-stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.trend-stat-card span {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 9px;
+}
+
+.trend-stat-card strong {
+    display: block;
+    font-size: 25px;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.trend-stat-card small {
+    color: var(--text-muted);
+}
+
+.trend-chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.trend-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.trend-chart-header h3 {
+    margin: 0 0 5px;
+}
+
+.trend-chart-header p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.trend-status {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.trend-up {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.trend-down {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.trend-neutral {
+    background: #F3F4F6;
+    color: #4B5563;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 380px;
+}
+
+.trend-error {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.trend-error-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.trend-error p {
+    color: var(--text-secondary);
+}
+
+
+/* ============================================================
+   NEARBY MANDIS
+============================================================ */
+
+.nearby-section {
+    padding: 96px 0;
+    background: #f8faf7;
+}
+
+.nearby-section .section-heading {
+    margin-bottom: 32px;
+}
+
+.nearby-section .section-kicker {
+    color: #16a34a;
+}
+
+.nearby-mandis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+/* ============================================================
+   NEARBY MANDI CARD
+============================================================ */
+
+.nearby-mandi-card {
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 18px;
+
+    min-height: 150px;
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5ebe6;
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 14px rgba(23, 33, 27, 0.05);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.nearby-mandi-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #bbf7d0;
+
+    box-shadow:
+        0 12px 28px rgba(23, 33, 27, 0.08);
+}
+
+
+/* ============================================================
+   BEST PRICE CARD
+============================================================ */
+
+.best-nearby-mandi {
+    border-color: #86efac;
+
+    box-shadow:
+        0 8px 24px rgba(22, 163, 74, 0.10);
+}
+
+
+/* ============================================================
+   RANK
+============================================================ */
+
+.nearby-rank {
+    flex: 0 0 42px;
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #dcfce7;
+    color: #166534;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   MANDI INFORMATION
+============================================================ */
+
+.nearby-mandi-info {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+.nearby-mandi-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+
+.nearby-mandi-info h3 {
+    margin: 0;
+
+    color: #17211b;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.nearby-mandi-info p {
+    margin: 7px 0 0;
+
+    color: #647067;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   BEST PRICE BADGE
+============================================================ */
+
+.nearby-best-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 999px;
+
+    background: #dcfce7;
+    color: #166534;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   PRICE
+============================================================ */
+
+.nearby-price {
+    display: flex;
+    align-items: baseline;
+
+    gap: 6px;
+
+    margin-top: 14px;
+}
+
+
+.nearby-price span {
+    color: #647067;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+.nearby-price strong {
+    color: #166534;
+
+    font-size: 21px;
+    font-weight: 800;
+}
+
+
+.nearby-price small {
+    color: #94a39a;
+
+    font-size: 11px;
+}
+
+
+.nearby-price-range {
+    margin-top: 3px;
+
+    color: #647067;
+
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   PRICE UNAVAILABLE
+============================================================ */
+
+.nearby-no-price {
+    margin-top: 14px;
+
+    color: #94a39a;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   DISTANCE
+============================================================ */
+
+.nearby-distance {
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 3px;
+}
+
+
+.nearby-distance strong {
+    color: #166534;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.nearby-distance span {
+    color: #94a39a;
+
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.nearby-empty {
+    grid-column: 1 / -1;
+
+    padding: 48px 24px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border: 1px dashed #cbd5cf;
+    border-radius: 18px;
+}
+
+
+.nearby-empty-icon {
+    width: 56px;
+    height: 56px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 16px;
+
+    border-radius: 50%;
+
+    background: #dcfce7;
+
+    font-size: 24px;
+}
+
+
+.nearby-empty h3 {
+    margin: 0 0 8px;
+
+    color: #17211b;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+.nearby-empty p {
+    max-width: 440px;
+
+    margin: 0 auto;
+
+    color: #647067;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
