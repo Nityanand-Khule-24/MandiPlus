@@ -6,10 +6,14 @@ const NearbyState = {
     mandis: [],
     nearbyMandis: [],
     rates: [],
+
     commodity: "Onion",
+
     latitude: null,
     longitude: null,
-    initialized: false
+
+    initialized: false,
+    loadingRates: false
 };
 
 
@@ -40,12 +44,12 @@ function normalizeMarketName(name) {
         .trim()
         .toLowerCase()
         .replace(/\s+/g, "")
-        .replace(/[()[\]{}.,'"\-_/]/g, "");
+        .replace(/[()[\]{}.,'"_\/\\-]/g, "");
 }
 
 
 /*
- * Convert a value safely into a number.
+ * Safe number conversion.
  */
 function safeNumber(value) {
 
@@ -54,6 +58,21 @@ function safeNumber(value) {
     return Number.isFinite(number)
         ? number
         : null;
+}
+
+
+/*
+ * Escape HTML before inserting API/database values
+ * into innerHTML.
+ */
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
@@ -136,12 +155,10 @@ async function loadNearbyMandis() {
             NearbyState.mandis.length
         );
 
-        /*
-         * Debug coordinate information.
-         */
         console.table(
             NearbyState.mandis.map(mandi => ({
                 name: mandi.name,
+                state: mandi.state,
                 district: mandi.district,
                 latitude: mandi.latitude,
                 longitude: mandi.longitude
@@ -164,48 +181,278 @@ async function loadNearbyMandis() {
    LOAD COMMODITY RATES
    ============================================================ */
 
+/*
+ * IMPORTANT:
+ *
+ * Nearby Mandis are not restricted to Pune.
+ *
+ * Therefore we DO NOT send:
+ *
+ *     district: "Pune"
+ *
+ * Instead we load the selected commodity across all available
+ * markets.
+ *
+ * We intentionally keep page_size at 50 because this value is
+ * already accepted by the current backend.
+ *
+ * Multiple pages are loaded when necessary.
+ */
+
 async function loadNearbyRates() {
+
+    if (NearbyState.loadingRates) {
+        console.warn(
+            "[Nearby] Rate loading already in progress."
+        );
+
+        return;
+    }
+
+    NearbyState.loadingRates = true;
 
     try {
 
-        const response =
-            await window.MandiPlusAPI.getRates({
-                district: "Pune",
-                commodity: NearbyState.commodity,
-                page_size: 50
-            });
+        const pageSize = 50;
+
+        /*
+         * Safety limit.
+         *
+         * 20 pages x 50 = maximum 1000 records.
+         *
+         * This prevents an accidental infinite loop.
+         */
+        const maxPages = 20;
+
+        let allRates = [];
+
+        let currentPage = 1;
+
+        let totalCount = null;
+
+
+        while (currentPage <= maxPages) {
+
+            console.log(
+                `[Nearby] Loading ${NearbyState.commodity} rates - page ${currentPage}`
+            );
+
+
+            const response =
+                await window.MandiPlusAPI.getRates({
+
+                    commodity:
+                        NearbyState.commodity,
+
+                    page:
+                        currentPage,
+
+                    page_size:
+                        pageSize
+                });
+
+
+            const pageRates =
+                Array.isArray(response)
+                    ? response
+                    : Array.isArray(response?.data)
+                        ? response.data
+                        : [];
+
+
+            /*
+             * Backend may provide total count.
+             */
+            if (
+                totalCount === null &&
+                response &&
+                Number.isFinite(
+                    Number(response.count)
+                )
+            ) {
+
+                totalCount =
+                    Number(response.count);
+            }
+
+
+            /*
+             * Add current page.
+             */
+            allRates.push(
+                ...pageRates
+            );
+
+
+            console.log(
+                `[Nearby] Page ${currentPage} loaded: ${pageRates.length} records`
+            );
+
+
+            /*
+             * Stop conditions.
+             */
+
+            if (!pageRates.length) {
+                break;
+            }
+
+
+            /*
+             * If backend tells us total count,
+             * stop when everything is loaded.
+             */
+            if (
+                totalCount !== null &&
+                allRates.length >= totalCount
+            ) {
+
+                break;
+            }
+
+
+            /*
+             * If fewer than pageSize were returned,
+             * there is no next page.
+             */
+            if (
+                pageRates.length < pageSize
+            ) {
+
+                break;
+            }
+
+
+            currentPage++;
+        }
+
+
+        /*
+         * Remove duplicate rate records.
+         *
+         * Key:
+         * market + commodity + variety + grade + date
+         */
+        const uniqueRates = [];
+
+        const seenRates = new Set();
+
+
+        allRates.forEach(rate => {
+
+            const key = [
+                normalizeMarketName(rate.market),
+
+                String(
+                    rate.commodity || ""
+                )
+                    .trim()
+                    .toLowerCase(),
+
+                String(
+                    rate.variety || ""
+                )
+                    .trim()
+                    .toLowerCase(),
+
+                String(
+                    rate.grade || ""
+                )
+                    .trim()
+                    .toLowerCase(),
+
+                String(
+                    rate.reported_date || ""
+                )
+
+            ].join("|");
+
+
+            if (!seenRates.has(key)) {
+
+                seenRates.add(key);
+
+                uniqueRates.push(rate);
+            }
+        });
+
 
         NearbyState.rates =
-            Array.isArray(response)
-                ? response
-                : Array.isArray(response?.data)
-                    ? response.data
-                    : [];
+            uniqueRates;
+
 
         console.log(
             "[Nearby] Rates loaded:",
-            NearbyState.rates.length,
-            "for",
+            NearbyState.rates.length
+        );
+
+        console.log(
+            "[Nearby] Commodity:",
             NearbyState.commodity
         );
 
+        console.log(
+            "[Nearby] API total count:",
+            totalCount
+        );
+
+
         /*
-         * Debugging table.
+         * Show available API markets.
+         */
+        const availableMarkets = [
+            ...new Set(
+                NearbyState.rates
+                    .map(rate => rate.market)
+                    .filter(Boolean)
+            )
+        ];
+
+
+        console.log(
+            "[Nearby] Available API markets:",
+            availableMarkets
+        );
+
+
+        /*
+         * Useful debugging table.
          */
         console.table(
             NearbyState.rates.map(rate => ({
-                market: rate.market,
-                normalizedMarket:
-                    normalizeMarketName(rate.market),
-                commodity: rate.commodity,
-                variety: rate.variety,
-                grade: rate.grade,
-                min: rate.min_price,
-                modal: rate.modal_price,
-                max: rate.max_price,
-                date: rate.reported_date
+
+                market:
+                    rate.market,
+
+                district:
+                    rate.district,
+
+                state:
+                    rate.state,
+
+                commodity:
+                    rate.commodity,
+
+                variety:
+                    rate.variety,
+
+                grade:
+                    rate.grade,
+
+                min:
+                    rate.min_price,
+
+                modal:
+                    rate.modal_price,
+
+                max:
+                    rate.max_price,
+
+                date:
+                    rate.reported_date
             }))
         );
+
 
     } catch (error) {
 
@@ -215,12 +462,16 @@ async function loadNearbyRates() {
         );
 
         NearbyState.rates = [];
+
+    } finally {
+
+        NearbyState.loadingRates = false;
     }
 }
 
 
 /* ============================================================
-   GET BEST RATE FOR MANDI
+   FIND BEST RATE FOR MANDI
    ============================================================ */
 
 function getMandiRate(mandiName) {
@@ -228,20 +479,27 @@ function getMandiRate(mandiName) {
     const normalizedMandi =
         normalizeMarketName(mandiName);
 
+
     console.log(
         `[Nearby] Searching rate for: "${mandiName}"`,
         "→",
         normalizedMandi
     );
 
+
     /*
-     * Match market names using normalized values.
+     * --------------------------------------------------------
+     * 1. EXACT MATCH
+     * --------------------------------------------------------
      */
-    const matchingRates =
+
+    let matchingRates =
         NearbyState.rates.filter(rate => {
 
             const normalizedRateMarket =
-                normalizeMarketName(rate.market);
+                normalizeMarketName(
+                    rate.market
+                );
 
             return (
                 normalizedRateMarket ===
@@ -249,27 +507,104 @@ function getMandiRate(mandiName) {
             );
         });
 
+
     /*
-     * No matching market.
+     * --------------------------------------------------------
+     * 2. SAFE FALLBACK MATCH
+     * --------------------------------------------------------
+     *
+     * Handles small differences where one market name contains
+     * the other.
+     *
+     * Example:
+     *
+     * Mandi:
+     * "Pune(Pimpri)"
+     *
+     * API:
+     * "Pune (Pimpri) "
+     *
+     * Exact normalization already handles this.
+     *
+     * This fallback is only used when exact matching fails.
      */
+
+    if (
+        !matchingRates.length &&
+        normalizedMandi.length >= 6
+    ) {
+
+        const fallbackMatches =
+            NearbyState.rates.filter(rate => {
+
+                const normalizedRateMarket =
+                    normalizeMarketName(
+                        rate.market
+                    );
+
+                if (
+                    !normalizedRateMarket ||
+                    normalizedRateMarket.length < 6
+                ) {
+                    return false;
+                }
+
+                return (
+                    normalizedRateMarket.includes(
+                        normalizedMandi
+                    ) ||
+                    normalizedMandi.includes(
+                        normalizedRateMarket
+                    )
+                );
+            });
+
+
+        /*
+         * Only accept fallback when there is
+         * exactly one unique market candidate.
+         */
+        const uniqueMarkets = [
+            ...new Set(
+                fallbackMatches.map(
+                    rate =>
+                        normalizeMarketName(
+                            rate.market
+                        )
+                )
+            )
+        ];
+
+
+        if (
+            uniqueMarkets.length === 1
+        ) {
+
+            matchingRates =
+                fallbackMatches;
+
+            console.warn(
+                `[Nearby] Fallback market match: "${mandiName}" → "${fallbackMatches[0]?.market}"`
+            );
+        }
+    }
+
+
+    /*
+     * --------------------------------------------------------
+     * 3. NO MATCH
+     * --------------------------------------------------------
+     */
+
     if (!matchingRates.length) {
 
         console.warn(
             `[Nearby] No rate found for mandi: "${mandiName}"`
         );
 
-        const possibleMarkets =
-            NearbyState.rates
-                .map(rate => rate.market)
-                .filter(Boolean);
-
-        console.warn(
-            "[Nearby] Available API markets:",
-            possibleMarkets
-        );
-
         return null;
     }
+
 
     console.log(
         `[Nearby] Found ${matchingRates.length} rate(s) for "${mandiName}"`,
@@ -283,13 +618,17 @@ function getMandiRate(mandiName) {
 
     const validDates =
         matchingRates
-            .map(rate => rate.reported_date)
+            .map(
+                rate =>
+                    rate.reported_date
+            )
             .filter(Boolean)
             .sort(
                 (a, b) =>
                     new Date(a) -
                     new Date(b)
             );
+
 
     if (!validDates.length) {
 
@@ -300,8 +639,12 @@ function getMandiRate(mandiName) {
         return null;
     }
 
+
     const latestDate =
-        validDates[validDates.length - 1];
+        validDates[
+            validDates.length - 1
+        ];
+
 
     console.log(
         `[Nearby] Latest date for "${mandiName}":`,
@@ -316,8 +659,10 @@ function getMandiRate(mandiName) {
     const latestRates =
         matchingRates.filter(
             rate =>
-                rate.reported_date === latestDate
+                rate.reported_date ===
+                latestDate
         );
+
 
     if (!latestRates.length) {
         return null;
@@ -332,13 +677,16 @@ function getMandiRate(mandiName) {
         latestRates.filter(rate => {
 
             const modal =
-                safeNumber(rate.modal_price);
+                safeNumber(
+                    rate.modal_price
+                );
 
             return (
                 modal !== null &&
                 modal > 0
             );
         });
+
 
     if (!validRates.length) {
 
@@ -362,30 +710,50 @@ function getMandiRate(mandiName) {
                     return rate;
                 }
 
+
+                const currentModal =
+                    safeNumber(
+                        rate.modal_price
+                    );
+
+                const bestModal =
+                    safeNumber(
+                        best.modal_price
+                    );
+
+
                 return (
-                    safeNumber(rate.modal_price) >
-                    safeNumber(best.modal_price)
+                    currentModal >
+                    bestModal
                 )
                     ? rate
                     : best;
+
             },
             null
         );
 
 
     /*
-     * Return a clean price object.
+     * Return clean price object.
      */
+
     return {
 
         modal_price:
-            safeNumber(bestRate.modal_price),
+            safeNumber(
+                bestRate.modal_price
+            ),
 
         min_price:
-            safeNumber(bestRate.min_price),
+            safeNumber(
+                bestRate.min_price
+            ),
 
         max_price:
-            safeNumber(bestRate.max_price),
+            safeNumber(
+                bestRate.max_price
+            ),
 
         reported_date:
             bestRate.reported_date,
@@ -397,7 +765,8 @@ function getMandiRate(mandiName) {
             bestRate.grade || "",
 
         market:
-            bestRate.market || mandiName
+            bestRate.market ||
+            mandiName
     };
 }
 
@@ -421,15 +790,21 @@ function findNearbyMandis(
         return [];
     }
 
+
     const userLatitude =
         Number(latitude);
 
     const userLongitude =
         Number(longitude);
 
+
     if (
-        !Number.isFinite(userLatitude) ||
-        !Number.isFinite(userLongitude)
+        !Number.isFinite(
+            userLatitude
+        ) ||
+        !Number.isFinite(
+            userLongitude
+        )
     ) {
 
         console.error(
@@ -439,50 +814,67 @@ function findNearbyMandis(
         return [];
     }
 
+
     /*
-     * Save coordinates so that commodity changes
-     * can recalculate nearby mandis later.
+     * Save coordinates.
      */
+
     NearbyState.latitude =
         userLatitude;
 
     NearbyState.longitude =
         userLongitude;
 
+
+    /*
+     * Calculate distance for every mandi
+     * that has valid coordinates.
+     */
+
     const mandisWithDistance =
         NearbyState.mandis
 
-            /*
-             * Only use mandis with coordinates.
-             */
             .filter(mandi => {
 
                 return (
                     Number.isFinite(
-                        Number(mandi.latitude)
+                        Number(
+                            mandi.latitude
+                        )
                     ) &&
                     Number.isFinite(
-                        Number(mandi.longitude)
+                        Number(
+                            mandi.longitude
+                        )
                     )
                 );
 
             })
 
-            /*
-             * Calculate distance and price.
-             */
             .map(mandi => {
 
                 const distance =
                     calculateDistance(
+
                         userLatitude,
+
                         userLongitude,
-                        Number(mandi.latitude),
-                        Number(mandi.longitude)
+
+                        Number(
+                            mandi.latitude
+                        ),
+
+                        Number(
+                            mandi.longitude
+                        )
                     );
 
+
                 const rate =
-                    getMandiRate(mandi.name);
+                    getMandiRate(
+                        mandi.name
+                    );
+
 
                 return {
 
@@ -493,14 +885,10 @@ function findNearbyMandis(
 
                     rate:
                         rate
-
                 };
 
             })
 
-            /*
-             * Nearest first.
-             */
             .sort(
                 (a, b) =>
                     a.distance_km -
@@ -508,16 +896,22 @@ function findNearbyMandis(
             );
 
 
+    /*
+     * Keep only requested number.
+     */
+
     NearbyState.nearbyMandis =
         mandisWithDistance.slice(
             0,
             limit
         );
 
+
     console.log(
         "[Nearby] Nearest mandis:",
         NearbyState.nearbyMandis
     );
+
 
     return NearbyState.nearbyMandis;
 }
@@ -530,18 +924,30 @@ function findNearbyMandis(
 function getBestNearbyPrice(mandis) {
 
     const withRates =
-        mandis.filter(
-            mandi =>
-                mandi.rate &&
-                Number.isFinite(
-                    Number(mandi.rate.modal_price)
-                ) &&
-                Number(mandi.rate.modal_price) > 0
-        );
+        mandis.filter(mandi => {
+
+            if (!mandi.rate) {
+                return false;
+            }
+
+
+            const modal =
+                safeNumber(
+                    mandi.rate.modal_price
+                );
+
+
+            return (
+                modal !== null &&
+                modal > 0
+            );
+        });
+
 
     if (!withRates.length) {
         return null;
     }
+
 
     return withRates.reduce(
         (best, mandi) => {
@@ -550,11 +956,21 @@ function getBestNearbyPrice(mandis) {
                 return mandi;
             }
 
-            return Number(
-                mandi.rate.modal_price
-            ) >
-            Number(
-                best.rate.modal_price
+
+            const currentPrice =
+                safeNumber(
+                    mandi.rate.modal_price
+                );
+
+            const bestPrice =
+                safeNumber(
+                    best.rate.modal_price
+                );
+
+
+            return (
+                currentPrice >
+                bestPrice
             )
                 ? mandi
                 : best;
@@ -569,10 +985,15 @@ function getBestNearbyPrice(mandis) {
    RENDER NEARBY MANDIS
    ============================================================ */
 
-function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
+function renderNearbyMandis(
+    mandis = NearbyState.nearbyMandis
+) {
 
     const container =
-        nearbyElement("nearbyMandis");
+        nearbyElement(
+            "nearbyMandis"
+        );
+
 
     if (!container) {
 
@@ -582,6 +1003,7 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
 
         return;
     }
+
 
     if (!mandis.length) {
 
@@ -609,8 +1031,12 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
         return;
     }
 
+
     const bestMandi =
-        getBestNearbyPrice(mandis);
+        getBestNearbyPrice(
+            mandis
+        );
+
 
     container.innerHTML =
 
@@ -621,45 +1047,98 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
                     mandi.distance_km < 1
 
                         ? `${Math.round(
-                            mandi.distance_km * 1000
+                            mandi.distance_km *
+                            1000
                         )} m`
 
                         : `${mandi.distance_km.toFixed(
                             1
                         )} km`;
 
+
                 const rate =
                     mandi.rate;
+
 
                 const modalPrice =
                     safeNumber(
                         rate?.modal_price
                     );
 
+
                 const minPrice =
                     safeNumber(
                         rate?.min_price
                     );
+
 
                 const maxPrice =
                     safeNumber(
                         rate?.max_price
                     );
 
+
                 const hasPrice =
                     modalPrice !== null &&
                     modalPrice > 0;
 
+
                 const isBest =
                     bestMandi &&
-                    bestMandi.name === mandi.name;
+                    bestMandi.name ===
+                        mandi.name;
+
+
+                const mandiName =
+                    escapeHtml(
+                        mandi.name ||
+                        "Unknown Mandi"
+                    );
+
+
+                const district =
+                    escapeHtml(
+                        mandi.district ||
+                        ""
+                    );
+
+
+                const state =
+                    escapeHtml(
+                        mandi.state ||
+                        ""
+                    );
+
+
+                const commodity =
+                    escapeHtml(
+                        NearbyState.commodity
+                    );
+
+
+                const variety =
+                    escapeHtml(
+                        rate?.variety ||
+                        ""
+                    );
+
+
+                const reportedDate =
+                    escapeHtml(
+                        rate?.reported_date ||
+                        ""
+                    );
+
 
                 return `
 
                     <article
                         class="
                             nearby-mandi-card
-                            ${isBest ? "best-nearby-mandi" : ""}
+                            ${isBest
+                                ? "best-nearby-mandi"
+                                : ""
+                            }
                         "
                     >
 
@@ -677,16 +1156,21 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
                             <div class="nearby-mandi-title-row">
 
                                 <h3>
-                                    ${mandi.name || "Unknown Mandi"}
+                                    ${mandiName}
                                 </h3>
+
 
                                 ${
                                     isBest
+
                                         ? `
+
                                             <span class="nearby-best-badge">
                                                 Best Price
                                             </span>
-                                        `
+
+                                          `
+
                                         : ""
                                 }
 
@@ -694,10 +1178,11 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
 
 
                             <p>
-                                ${mandi.district || ""}
+                                ${district}
+
                                 ${
-                                    mandi.state
-                                        ? `, ${mandi.state}`
+                                    state
+                                        ? `, ${state}`
                                         : ""
                                 }
                             </p>
@@ -711,7 +1196,7 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
                                         <div class="nearby-price">
 
                                             <span>
-                                                ${NearbyState.commodity}
+                                                ${commodity}
                                             </span>
 
                                             <strong>
@@ -747,29 +1232,38 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
 
                                                     </div>
 
-                                                `
+                                                  `
 
                                                 : ""
                                         }
 
 
                                         ${
-                                            rate?.variety
+                                            variety
+
                                                 ? `
+
                                                     <div class="nearby-price-range">
-                                                        Variety: ${rate.variety}
+                                                        Variety: ${variety}
                                                     </div>
-                                                `
+
+                                                  `
+
                                                 : ""
                                         }
 
+
                                         ${
-                                            rate?.reported_date
+                                            reportedDate
+
                                                 ? `
+
                                                     <div class="nearby-price-range">
-                                                        Updated: ${rate.reported_date}
+                                                        Updated: ${reportedDate}
                                                     </div>
-                                                `
+
+                                                  `
+
                                                 : ""
                                         }
 
@@ -778,7 +1272,7 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
                                     : `
 
                                         <div class="nearby-no-price">
-                                            Price unavailable
+                                            Price unavailable for ${commodity}
                                         </div>
 
                                       `
@@ -804,7 +1298,6 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
                     </article>
 
                 `;
-
             }
         ).join("");
 }
@@ -814,12 +1307,15 @@ function renderNearbyMandis(mandis = NearbyState.nearbyMandis) {
    HANDLE LOCATION
    ============================================================ */
 
-async function handleLocationDetected(event) {
+async function handleLocationDetected(
+    event
+) {
 
     const {
         latitude,
         longitude
     } = event.detail || {};
+
 
     console.log(
         "[Nearby] User coordinates:",
@@ -827,9 +1323,14 @@ async function handleLocationDetected(event) {
         longitude
     );
 
+
     if (
-        !Number.isFinite(Number(latitude)) ||
-        !Number.isFinite(Number(longitude))
+        !Number.isFinite(
+            Number(latitude)
+        ) ||
+        !Number.isFinite(
+            Number(longitude)
+        )
     ) {
 
         console.error(
@@ -839,6 +1340,7 @@ async function handleLocationDetected(event) {
         return;
     }
 
+
     NearbyState.latitude =
         Number(latitude);
 
@@ -847,10 +1349,12 @@ async function handleLocationDetected(event) {
 
 
     /*
-     * Make sure rates are loaded before
-     * calculating nearby prices.
+     * Make sure rates exist.
      */
-    if (!NearbyState.rates.length) {
+
+    if (
+        !NearbyState.rates.length
+    ) {
 
         console.log(
             "[Nearby] Rates empty. Reloading..."
@@ -859,12 +1363,17 @@ async function handleLocationDetected(event) {
         await loadNearbyRates();
     }
 
+
     const nearby =
         findNearbyMandis(
+
             NearbyState.latitude,
+
             NearbyState.longitude,
+
             5
         );
+
 
     renderNearbyMandis(
         nearby
@@ -876,10 +1385,13 @@ async function handleLocationDetected(event) {
    HANDLE COMMODITY CHANGE
    ============================================================ */
 
-async function handleCommoditySelected(event) {
+async function handleCommoditySelected(
+    event
+) {
 
     const selectedCommodity =
         event.detail?.commodity;
+
 
     if (!selectedCommodity) {
 
@@ -889,6 +1401,11 @@ async function handleCommoditySelected(event) {
 
         return;
     }
+
+
+    /*
+     * Avoid unnecessary reload.
+     */
 
     if (
         selectedCommodity ===
@@ -904,57 +1421,70 @@ async function handleCommoditySelected(event) {
         return;
     }
 
+
     console.log(
         `[Nearby] Commodity changed: ${NearbyState.commodity} → ${selectedCommodity}`
     );
 
+
+    /*
+     * Update commodity.
+     */
+
     NearbyState.commodity =
         selectedCommodity;
 
+
     updateNearbyCommodityHeading();
 
+
     /*
-     * Reload prices for the selected commodity.
+     * Load selected commodity rates
+     * across all available markets.
      */
+
     await loadNearbyRates();
 
-    console.table(
-    NearbyState.rates.map(rate => ({
-        market: rate.market,
-        commodity: rate.commodity,
-        modal: rate.modal_price,
-        min: rate.min_price,
-        max: rate.max_price,
-        date: rate.reported_date
-    }))
-    );
 
     /*
-     * If user location has already been detected,
-     * recalculate nearby mandis with the new prices.
+     * If location is available,
+     * recalculate nearby mandis.
      */
+
     if (
-        Number.isFinite(NearbyState.latitude) &&
-        Number.isFinite(NearbyState.longitude)
+        Number.isFinite(
+            NearbyState.latitude
+        ) &&
+        Number.isFinite(
+            NearbyState.longitude
+        )
     ) {
 
         const nearby =
             findNearbyMandis(
+
                 NearbyState.latitude,
+
                 NearbyState.longitude,
+
                 5
             );
+
 
         renderNearbyMandis(
             nearby
         );
 
-    } else if (NearbyState.nearbyMandis.length) {
+
+    } else if (
+        NearbyState.nearbyMandis.length
+    ) {
 
         /*
-         * Fallback in case nearby mandis exist but
-         * coordinates are not currently stored.
+         * Fallback:
+         * update existing mandi prices.
          */
+
         NearbyState.nearbyMandis =
             NearbyState.nearbyMandis.map(
                 mandi => ({
@@ -969,10 +1499,12 @@ async function handleCommoditySelected(event) {
                 })
             );
 
+
         renderNearbyMandis(
             NearbyState.nearbyMandis
         );
     }
+
 
     console.log(
         `[Nearby] Updated nearby prices for ${selectedCommodity}`
@@ -986,35 +1518,43 @@ async function handleCommoditySelected(event) {
 
 async function initialize() {
 
-    if (NearbyState.initialized) {
+    if (
+        NearbyState.initialized
+    ) {
         return;
     }
+
 
     console.log(
         "[Nearby] Initializing nearby mandi service..."
     );
 
+
     /*
      * Set initial heading.
      */
+
     updateNearbyCommodityHeading();
 
 
     /*
      * Load mandi locations.
      */
+
     await loadNearbyMandis();
 
 
     /*
-     * Load current commodity prices.
+     * Load initial commodity rates.
      */
+
     await loadNearbyRates();
 
 
     /*
      * Listen for location detection.
      */
+
     document.addEventListener(
         "mandiplus:location-detected",
         handleLocationDetected
@@ -1024,13 +1564,16 @@ async function initialize() {
     /*
      * Listen for commodity changes.
      */
+
     document.addEventListener(
         "mandiplus:commodity-selected",
         handleCommoditySelected
     );
 
 
-    NearbyState.initialized = true;
+    NearbyState.initialized =
+        true;
+
 
     console.log(
         "[MandiPlus] Nearby mandi service initialized."
@@ -1059,5 +1602,4 @@ window.MandiPlusNearby = {
     getState: () => ({
         ...NearbyState
     })
-
 };

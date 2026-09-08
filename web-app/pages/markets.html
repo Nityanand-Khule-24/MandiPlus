@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MandiPlus | Markets</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="site-header">
+
+        <div class="container navbar">
+
+            <a href="../index.html" class="brand">
+                <span class="brand-icon">🌾</span>
+
+                <span class="brand-text">
+                    Mandi<span>Plus</span>
+                </span>
+            </a>
+
+            <nav class="desktop-nav">
+
+                <a href="../index.html" class="nav-link">
+                    Home
+                </a>
+
+                <a href="prices.html" class="nav-link">
+                    Prices
+                </a>
+
+                <a href="markets.html" class="nav-link active">
+                    Markets
+                </a>
+
+                <a href="trends.html" class="nav-link">
+                    Trends
+                </a>
+
+                <a href="nearby.html" class="nav-link">
+                    Nearby
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- PAGE HERO -->
+
+    <main>
+
+        <section class="markets-page-hero">
+
+            <div class="container">
+
+                <span class="section-kicker">
+                    🏪 MARKET EXPLORER
+                </span>
+
+                <h1>
+                    Explore Mandi Markets
+                </h1>
+
+                <p>
+                    Discover agricultural markets and compare
+                    available commodity prices across Pune.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- MARKETS SECTION -->
+
+        <section class="markets-section">
+
+            <div class="container">
+
+
+                <!-- FILTERS -->
+
+                <div class="market-filter-card">
+
+                    <div class="market-search-group">
+
+                        <label for="marketSearch">
+                            Search Market
+                        </label>
+
+                        <input
+                            type="text"
+                            id="marketSearch"
+                            placeholder="Search by market name..."
+                        >
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="marketDistrict">
+                            District
+                        </label>
+
+                        <select id="marketDistrict">
+
+                            <option value="Pune">
+                                Pune
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        id="clearMarketSearch"
+                        class="secondary-button"
+                        type="button"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+
+                <!-- SUMMARY -->
+
+                <div class="summary-grid">
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            🏪
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Markets
+                            </span>
+
+                            <strong
+                                id="totalMarkets"
+                                class="summary-value"
+                            >
+                                0
+                            </strong>
+
+                            <span class="summary-meta">
+                                In selected district
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            🌾
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Commodities
+                            </span>
+
+                            <strong
+                                id="totalCommodities"
+                                class="summary-value"
+                            >
+                                0
+                            </strong>
+
+                            <span class="summary-meta">
+                                Available commodities
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            📍
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                District
+                            </span>
+
+                            <strong
+                                id="selectedDistrict"
+                                class="summary-value"
+                            >
+                                Pune
+                            </strong>
+
+                            <span class="summary-meta">
+                                Current location scope
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            📅
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Latest Data
+                            </span>
+
+                            <strong
+                                id="latestMarketDate"
+                                class="summary-value"
+                            >
+                                —
+                            </strong>
+
+                            <span class="summary-meta">
+                                Latest reported date
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOADING -->
+
+                <div
+                    id="marketsLoading"
+                    class="loading-state"
+                >
+                    Loading markets...
+                </div>
+
+
+                <!-- ERROR -->
+
+                <div
+                    id="marketsError"
+                    class="error-state hidden"
+                ></div>
+
+
+                <!-- MARKET GRID -->
+
+                <div
+                    id="marketsGrid"
+                    class="markets-grid"
+                ></div>
+
+
+                <!-- EMPTY -->
+
+                <div
+                    id="marketsEmpty"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        🏪
+                    </div>
+
+                    <h3>
+                        No markets found
+                    </h3>
+
+                    <p>
+                        Try a different market name.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <div class="footer-bottom">
+
+                <span>
+                    © 2026 MandiPlus
+                </span>
+
+                <span>
+                    Agricultural Market Intelligence
+                </span>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <script src="../js/api.js"></script>
+    <script src="../js/markets.js"></script>
+
+</body>
+
+</html>

@@ -11,7 +11,23 @@ from config import (
 )
 
 
+# ============================================================
+# LOGGING
+# ============================================================
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
 logger = logging.getLogger(__name__)
+
+
+# ============================================================
+# SETTINGS
+# ============================================================
+
+TARGET_DISTRICT = "Pune"
 
 
 # ============================================================
@@ -19,19 +35,61 @@ logger = logging.getLogger(__name__)
 # ============================================================
 
 def extract_from_csv():
+    """
+    Extract data from the local CSV fallback.
 
-    logger.info(
-        f"Reading CSV fallback: {SAMPLE_CSV_FILE}"
-    )
+    The fallback is also filtered to Pune district so that
+    the pipeline keeps the same geographic scope as AGMARKNET.
+    """
+
+    logger.info("=" * 60)
+    logger.info("READING CSV FALLBACK")
+    logger.info("=" * 60)
 
     try:
-
         df = pd.read_csv(SAMPLE_CSV_FILE)
 
         logger.info(
-            f"Successfully extracted "
-            f"{len(df)} records from CSV"
+            f"Successfully extracted {len(df)} records from CSV"
         )
+
+        # ----------------------------------------------------
+        # Normalize column names
+        # ----------------------------------------------------
+
+        df.columns = (
+            df.columns
+            .str.strip()
+            .str.lower()
+        )
+
+        # ----------------------------------------------------
+        # Filter Pune district
+        # ----------------------------------------------------
+
+        if "district" in df.columns:
+
+            before_count = len(df)
+
+            df = df[
+                df["district"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                == TARGET_DISTRICT.lower()
+            ].copy()
+
+            logger.info(
+                f"Pune district filter: "
+                f"{before_count} → {len(df)} records"
+            )
+
+        else:
+
+            logger.warning(
+                "District column not found in CSV. "
+                "Pune filtering could not be applied."
+            )
 
         return df
 
@@ -53,6 +111,204 @@ def extract_from_csv():
 
 
 # ============================================================
+# FILTER PUNE DATA
+# ============================================================
+
+def filter_pune_data(df):
+    """
+    Keep ALL available records belonging to Pune district.
+
+    Important:
+    We do NOT select a single market.
+
+    Every market returned by AGMARKNET for Pune is retained.
+    """
+
+    if df is None:
+        logger.warning("Received None dataframe.")
+        return pd.DataFrame()
+
+    if df.empty:
+        return df
+
+    # --------------------------------------------------------
+    # Check district column
+    # --------------------------------------------------------
+
+    if "district" not in df.columns:
+
+        logger.warning(
+            "District column not found. "
+            "Cannot apply Pune district filter."
+        )
+
+        return df
+
+    # --------------------------------------------------------
+    # Normalize district values
+    # --------------------------------------------------------
+
+    district_values = (
+        df["district"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    # --------------------------------------------------------
+    # Filter Pune
+    # --------------------------------------------------------
+
+    pune_df = df[
+        district_values == TARGET_DISTRICT.lower()
+    ].copy()
+
+    logger.info(
+        f"Pune district records: "
+        f"{len(pune_df)} / {len(df)}"
+    )
+
+    # --------------------------------------------------------
+    # Show all available markets
+    # --------------------------------------------------------
+
+    if not pune_df.empty and "market" in pune_df.columns:
+
+        markets = sorted(
+            pune_df["market"]
+            .dropna()
+            .astype(str)
+            .str.strip()
+            .unique()
+            .tolist()
+        )
+
+        logger.info(
+            f"Available Pune markets: {len(markets)}"
+        )
+
+        for index, market in enumerate(markets, start=1):
+
+            market_count = len(
+                pune_df[
+                    pune_df["market"]
+                    .astype(str)
+                    .str.strip()
+                    == market
+                ]
+            )
+
+            logger.info(
+                f"  {index}. {market} "
+                f"({market_count} records)"
+            )
+
+    else:
+
+        logger.warning(
+            "No Pune records found."
+        )
+
+    return pune_df
+
+
+# ============================================================
+# VALIDATE EXTRACTED DATA
+# ============================================================
+
+def validate_extracted_data(df, commodity_name):
+    """
+    Validate the Pune data returned for a commodity.
+
+    This function does not reject data simply because a market
+    is missing. AGMARKNET may not have a report from every mandi
+    for every commodity/date.
+
+    It checks that:
+      - data exists
+      - Pune data exists
+      - market information exists
+      - price columns are available
+    """
+
+    if df is None or df.empty:
+
+        logger.warning(
+            f"{commodity_name}: validation failed - "
+            f"no records available"
+        )
+
+        return False
+
+    # --------------------------------------------------------
+    # Market validation
+    # --------------------------------------------------------
+
+    if "market" not in df.columns:
+
+        logger.warning(
+            f"{commodity_name}: market column missing"
+        )
+
+        return False
+
+    market_count = (
+        df["market"]
+        .dropna()
+        .astype(str)
+        .str.strip()
+        .replace("", pd.NA)
+        .dropna()
+        .nunique()
+    )
+
+    if market_count == 0:
+
+        logger.warning(
+            f"{commodity_name}: no valid markets found"
+        )
+
+        return False
+
+    # --------------------------------------------------------
+    # Price validation
+    # --------------------------------------------------------
+
+    required_price_columns = [
+        "min_price",
+        "max_price",
+        "modal_price"
+    ]
+
+    missing_price_columns = [
+        column
+        for column in required_price_columns
+        if column not in df.columns
+    ]
+
+    if missing_price_columns:
+
+        logger.warning(
+            f"{commodity_name}: missing price columns: "
+            f"{missing_price_columns}"
+        )
+
+        return False
+
+    # --------------------------------------------------------
+    # Validation successful
+    # --------------------------------------------------------
+
+    logger.info(
+        f"{commodity_name}: validation successful | "
+        f"{len(df)} records | "
+        f"{market_count} markets"
+    )
+
+    return True
+
+
+# ============================================================
 # AGMARKNET EXTRACTION
 # ============================================================
 
@@ -63,7 +319,7 @@ def extract_from_agmarknet():
     logger.info("=" * 60)
 
     # --------------------------------------------------------
-    # Get current date
+    # Current date
     # --------------------------------------------------------
 
     today = datetime.now()
@@ -72,8 +328,11 @@ def extract_from_agmarknet():
     month = today.month
 
     logger.info(
-        f"Extraction period: "
-        f"{year}-{month:02d}"
+        f"Extraction period: {year}-{month:02d}"
+    )
+
+    logger.info(
+        f"Target district: {TARGET_DISTRICT}"
     )
 
     logger.info(
@@ -83,9 +342,9 @@ def extract_from_agmarknet():
 
     all_data = []
 
-    # --------------------------------------------------------
-    # Extract each configured commodity
-    # --------------------------------------------------------
+    # ========================================================
+    # EXTRACT EACH COMMODITY
+    # ========================================================
 
     for commodity in AGMARKNET_COMMODITIES:
 
@@ -95,8 +354,7 @@ def extract_from_agmarknet():
         logger.info("-" * 60)
 
         logger.info(
-            f"Extracting commodity: "
-            f"{commodity_name}"
+            f"Extracting commodity: {commodity_name}"
         )
 
         logger.info(
@@ -106,69 +364,156 @@ def extract_from_agmarknet():
         try:
 
             # ------------------------------------------------
-            # Call AGMARKNET extractor
+            # Request AGMARKNET data
             # ------------------------------------------------
 
             df = extract_agmarknet_data(
-
                 year=year,
-
                 month=month,
-
                 state_id=AGMARKNET_STATE_ID,
-
                 commodity_id=commodity_id,
-
                 commodity_name=commodity_name
             )
 
             # ------------------------------------------------
-            # Check extracted data
+            # Check result
             # ------------------------------------------------
+
+            if df is None:
+
+                logger.warning(
+                    f"{commodity_name}: "
+                    f"Extractor returned None"
+                )
+
+                continue
 
             if df.empty:
 
                 logger.warning(
-                    f"No data found for "
-                    f"{commodity_name}"
+                    f"{commodity_name}: "
+                    f"No records returned from AGMARKNET"
+                )
+
+                continue
+
+            logger.info(
+                f"{commodity_name}: "
+                f"{len(df)} records returned from AGMARKNET"
+            )
+
+            # ------------------------------------------------
+            # Normalize column names
+            # ------------------------------------------------
+
+            df.columns = (
+                df.columns
+                .str.strip()
+                .str.lower()
+            )
+
+            # ------------------------------------------------
+            # Raw market count
+            # ------------------------------------------------
+
+            if "market" in df.columns:
+
+                raw_markets = (
+                    df["market"]
+                    .dropna()
+                    .astype(str)
+                    .str.strip()
+                    .replace("", pd.NA)
+                    .dropna()
+                    .unique()
+                )
+
+                logger.info(
+                    f"{commodity_name}: "
+                    f"{len(raw_markets)} markets returned "
+                    f"from Maharashtra"
+                )
+
+            # ------------------------------------------------
+            # Filter Pune district
+            # ------------------------------------------------
+
+            pune_df = filter_pune_data(df)
+
+            if pune_df.empty:
+
+                logger.warning(
+                    f"{commodity_name}: "
+                    f"No Pune district records found"
                 )
 
                 continue
 
             # ------------------------------------------------
-            # Store dataframe
+            # Validate Pune data
             # ------------------------------------------------
 
-            all_data.append(df)
+            if not validate_extracted_data(
+                pune_df,
+                commodity_name
+            ):
+
+                logger.warning(
+                    f"{commodity_name}: "
+                    f"validation failed"
+                )
+
+                continue
+
+            # ------------------------------------------------
+            # Add to final collection
+            # ------------------------------------------------
+
+            all_data.append(pune_df)
+
+            # ------------------------------------------------
+            # Commodity summary
+            # ------------------------------------------------
+
+            pune_market_count = (
+                pune_df["market"]
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .nunique()
+                if "market" in pune_df.columns
+                else 0
+            )
 
             logger.info(
                 f"{commodity_name}: "
-                f"{len(df)} records extracted"
+                f"{len(pune_df)} Pune records retained | "
+                f"{pune_market_count} Pune markets"
             )
 
         except Exception as e:
 
-            logger.error(
+            logger.exception(
                 f"Failed to extract "
                 f"{commodity_name}: {e}"
             )
 
-            # Continue with remaining commodities
+            # Continue with next commodity
             continue
 
     # ========================================================
-    # CHECK WHETHER ANY DATA WAS EXTRACTED
+    # CHECK DATA
     # ========================================================
 
     if not all_data:
 
         raise ValueError(
-            "AGMARKNET returned no data "
-            "for any configured commodity"
+            "AGMARKNET returned no Pune district data "
+            "for any configured commodity."
         )
 
     # ========================================================
-    # COMBINE ALL COMMODITY DATA
+    # COMBINE ALL COMMODITIES
     # ========================================================
 
     final_df = pd.concat(
@@ -177,20 +522,87 @@ def extract_from_agmarknet():
     )
 
     # ========================================================
-    # EXTRACTION SUMMARY
+    # REMOVE EXACT DUPLICATES
+    # ========================================================
+
+    before_duplicates = len(final_df)
+
+    final_df = final_df.drop_duplicates()
+
+    duplicates_removed = (
+        before_duplicates - len(final_df)
+    )
+
+    logger.info(
+        f"Duplicate records removed: "
+        f"{duplicates_removed}"
+    )
+
+    # ========================================================
+    # FINAL SUMMARY
     # ========================================================
 
     logger.info("=" * 60)
+    logger.info("AGMARKNET EXTRACTION SUMMARY")
+    logger.info("=" * 60)
 
     logger.info(
-        f"Total AGMARKNET records extracted: "
-        f"{len(final_df)}"
+        f"Total Pune records: {len(final_df)}"
     )
 
-    logger.info(
-        f"Total commodities extracted: "
-        f"{final_df['commodity'].nunique()}"
-    )
+    if "commodity" in final_df.columns:
+
+        logger.info(
+            f"Commodities: "
+            f"{final_df['commodity'].nunique()}"
+        )
+
+        for commodity_name, group in (
+            final_df.groupby("commodity")
+        ):
+
+            market_count = (
+                group["market"]
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .nunique()
+                if "market" in group.columns
+                else 0
+            )
+
+            logger.info(
+                f"  {commodity_name}: "
+                f"{len(group)} records | "
+                f"{market_count} markets"
+            )
+
+            if "market" in group.columns:
+
+                markets = sorted(
+                    group["market"]
+                    .dropna()
+                    .astype(str)
+                    .str.strip()
+                    .unique()
+                    .tolist()
+                )
+
+                for market in markets:
+
+                    market_count = len(
+                        group[
+                            group["market"]
+                            .astype(str)
+                            .str.strip()
+                            == market
+                        ]
+                    )
+
+                    logger.info(
+                        f"      - {market}: "
+                        f"{market_count}"
+                    )
 
     logger.info("=" * 60)
 
@@ -204,13 +616,13 @@ def extract_from_agmarknet():
 def extract_data():
 
     logger.info("=" * 60)
-    logger.info("STARTING DATA EXTRACTION")
+    logger.info("STARTING MANDIPLUS DATA EXTRACTION")
     logger.info("=" * 60)
 
     try:
 
         # ----------------------------------------------------
-        # Primary Source: AGMARKNET
+        # PRIMARY SOURCE
         # ----------------------------------------------------
 
         logger.info(
@@ -220,7 +632,7 @@ def extract_data():
         df = extract_from_agmarknet()
 
         logger.info(
-            "Primary extraction successful."
+            "Primary AGMARKNET extraction successful."
         )
 
         return df
@@ -228,7 +640,7 @@ def extract_data():
     except Exception as e:
 
         # ----------------------------------------------------
-        # Fallback Source: Sample CSV
+        # FALLBACK SOURCE
         # ----------------------------------------------------
 
         logger.warning(
@@ -246,3 +658,85 @@ def extract_data():
         )
 
         return df
+
+
+# ============================================================
+# SCRIPT ENTRY POINT
+# ============================================================
+
+if __name__ == "__main__":
+
+    print()
+    print("=" * 60)
+    print("🚀 MandiPlus Extraction Started")
+    print("=" * 60)
+    print()
+
+    try:
+
+        result = extract_data()
+
+        print()
+        print("=" * 60)
+        print("✅ EXTRACTION COMPLETED")
+        print("=" * 60)
+
+        print(
+            f"Total records: {len(result)}"
+        )
+
+        if "commodity" in result.columns:
+
+            print(
+                f"Commodities: "
+                f"{result['commodity'].nunique()}"
+            )
+
+        if "market" in result.columns:
+
+            print(
+                f"Markets: "
+                f"{result['market'].nunique()}"
+            )
+
+        print()
+        print("📊 Commodity + Market summary:")
+        print()
+
+        if (
+            "commodity" in result.columns
+            and "market" in result.columns
+        ):
+
+            summary = (
+                result
+                .groupby(
+                    ["commodity", "market"]
+                )
+                .size()
+                .reset_index(
+                    name="records"
+                )
+            )
+
+            print(
+                summary.to_string(
+                    index=False
+                )
+            )
+
+        print()
+        print("=" * 60)
+
+    except Exception as e:
+
+        print()
+        print("=" * 60)
+        print("❌ EXTRACTION FAILED")
+        print("=" * 60)
+
+        print(str(e))
+
+        print()
+
+        raise

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MandiPlus | Prices</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="site-header">
+
+        <div class="container navbar">
+
+            <a href="../index.html" class="brand">
+
+                <span class="brand-icon">🌾</span>
+
+                <span class="brand-text">
+                    Mandi<span>Plus</span>
+                </span>
+
+            </a>
+
+
+            <nav class="desktop-nav">
+
+                <a href="../index.html" class="nav-link">
+                    Home
+                </a>
+
+                <a href="prices.html" class="nav-link active">
+                    Prices
+                </a>
+
+                <a href="markets.html" class="nav-link">
+                    Markets
+                </a>
+
+                <a href="trends.html" class="nav-link">
+                    Trends
+                </a>
+
+                <a href="nearby.html" class="nav-link">
+                    Nearby
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <main>
+
+        <section class="prices-page-hero">
+
+            <div class="container">
+
+                <span class="section-kicker">
+                    💰 LIVE MANDI PRICES
+                </span>
+
+                <h1>
+                    Today's Market Prices
+                </h1>
+
+                <p>
+                    Compare commodity prices across Pune mandi markets.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PRICE SECTION
+        ================================================== -->
+
+        <section class="prices-section">
+
+            <div class="container">
+
+
+                <!-- FILTER CARD -->
+
+                <div class="price-filter-card">
+
+                    <div class="explorer-filters">
+
+
+                        <!-- Commodity -->
+
+                        <div class="filter-group">
+
+                            <label for="commodityFilter">
+                                Commodity
+                            </label>
+
+                            <select id="commodityFilter">
+
+                                <option value="">
+                                    Select commodity
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- District -->
+
+                        <div class="filter-group">
+
+                            <label for="districtFilter">
+                                District
+                            </label>
+
+                            <select id="districtFilter">
+
+                                <option value="Pune">
+                                    Pune
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Market -->
+
+                        <div class="filter-group">
+
+                            <label for="marketFilter">
+                                Market
+                            </label>
+
+                            <select id="marketFilter">
+
+                                <option value="">
+                                    All Markets
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Button -->
+
+                        <button
+                            id="applyFilters"
+                            class="primary-button explorer-button"
+                            type="button"
+                        >
+                            Apply Filters
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     LOADING
+                ================================================== -->
+
+                <div
+                    id="pricesLoading"
+                    class="loading-state"
+                >
+                    Loading latest prices...
+                </div>
+
+
+                <!-- =================================================
+                     ERROR
+                ================================================== -->
+
+                <div
+                    id="pricesError"
+                    class="error-state hidden"
+                ></div>
+
+
+                <!-- =================================================
+                     SUMMARY
+                ================================================== -->
+
+                <div
+                    id="priceSummary"
+                    class="summary-grid hidden"
+                >
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            🏪
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Markets
+                            </span>
+
+                            <strong
+                                id="marketCount"
+                                class="summary-value"
+                            >
+                                0
+                            </strong>
+
+                            <span class="summary-meta">
+                                Available markets
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            📉
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Lowest Price
+                            </span>
+
+                            <strong
+                                id="lowestPrice"
+                                class="summary-value"
+                            >
+                                ₹0
+                            </strong>
+
+                            <span class="summary-meta">
+                                Minimum market price
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            📈
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Highest Price
+                            </span>
+
+                            <strong
+                                id="highestPrice"
+                                class="summary-value"
+                            >
+                                ₹0
+                            </strong>
+
+                            <span class="summary-meta">
+                                Maximum market price
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            💰
+                        </div>
+
+                        <div>
+
+                            <span class="summary-label">
+                                Average Modal
+                            </span>
+
+                            <strong
+                                id="averageModal"
+                                class="summary-value"
+                            >
+                                ₹0
+                            </strong>
+
+                            <span class="summary-meta">
+                                Average modal price
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     TABLE
+                ================================================== -->
+
+                <div class="price-table-wrapper">
+
+                    <table class="price-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Market</th>
+
+                                <th>Commodity</th>
+
+                                <th>Variety</th>
+
+                                <th>Min Price</th>
+
+                                <th>Max Price</th>
+
+                                <th>Modal Price</th>
+
+                                <th>Arrival</th>
+
+                                <th>Date</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="pricesTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- =================================================
+                     EMPTY STATE
+                ================================================== -->
+
+                <div
+                    id="pricesEmpty"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        No price data found
+                    </h3>
+
+                    <p>
+                        Try another commodity or market.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <div class="footer-bottom">
+
+                <span>
+                    © 2026 MandiPlus
+                </span>
+
+                <span>
+                    Agricultural Market Intelligence
+                </span>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="../js/api.js"></script>
+    <script src="../js/prices.js"></script>
+
+</body>
+
+</html>

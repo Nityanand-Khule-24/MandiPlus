@@ -501,3 +501,106 @@ def load_to_supabase(df):
         ),
         "skipped": skipped_records
     }
+
+# ============================================================
+# MAIN EXECUTION
+# ============================================================
+
+if __name__ == "__main__":
+
+    from extract import extract_data
+    from transform import transform_data
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(message)s"
+    )
+
+    print("\n" + "=" * 60)
+    print("🚀 MandiPlus Database Load Started")
+    print("=" * 60)
+
+    try:
+
+        # ----------------------------------------------------
+        # STEP 1: EXTRACT
+        # ----------------------------------------------------
+
+        print("\n📥 Extracting data...")
+
+        raw_df = extract_data()
+
+        print(
+            f"Extracted records: {len(raw_df)}"
+        )
+
+        # ----------------------------------------------------
+        # STEP 2: TRANSFORM
+        # ----------------------------------------------------
+
+        print("\n🔄 Transforming data...")
+
+        transformed_df = transform_data(
+            raw_df
+        )
+
+        print(
+            f"Transformed records: "
+            f"{len(transformed_df)}"
+        )
+
+        # ----------------------------------------------------
+        # STEP 3: LOAD
+        # ----------------------------------------------------
+
+        print("\n📤 Loading data into Supabase...")
+
+        result = load_to_supabase(
+            transformed_df
+        )
+
+        # ----------------------------------------------------
+        # FINAL SUMMARY
+        # ----------------------------------------------------
+
+        print("\n" + "=" * 60)
+        print("✅ DATABASE LOAD COMPLETED")
+        print("=" * 60)
+
+        print(
+            f"Total records: "
+            f"{result['total']}"
+        )
+
+        print(
+            f"Successfully loaded: "
+            f"{result['successful']}"
+        )
+
+        print(
+            f"Skipped: "
+            f"{result['skipped']}"
+        )
+
+        print(
+            f"Failed: "
+            f"{result['failed']}"
+        )
+
+        print("=" * 60)
+
+    except Exception as e:
+
+        logger.exception(
+            "Database load pipeline failed"
+        )
+
+        print("\n" + "=" * 60)
+        print("❌ DATABASE LOAD FAILED")
+        print("=" * 60)
+
+        print(f"Error: {e}")
+
+        print("=" * 60)
+
+        raise

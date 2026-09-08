@@ -73,6 +73,10 @@ AGMARKNET_COMMODITIES = [
     {
         "id": 305,
         "name": "Onion Green"
+    },
+    {
+        "id": 65,
+        "name": "Tomato"
     }
 ]
 

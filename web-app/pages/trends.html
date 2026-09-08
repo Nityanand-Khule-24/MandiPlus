@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MandiPlus | Price Trends</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="site-header">
+
+        <div class="container navbar">
+
+            <a href="../index.html" class="brand">
+
+                <span class="brand-icon">🌾</span>
+
+                <span class="brand-text">
+                    Mandi<span>Plus</span>
+                </span>
+
+            </a>
+
+
+            <nav class="desktop-nav">
+
+                <a href="../index.html" class="nav-link">
+                    Home
+                </a>
+
+                <a href="prices.html" class="nav-link">
+                    Prices
+                </a>
+
+                <a href="markets.html" class="nav-link">
+                    Markets
+                </a>
+
+                <a href="trends.html" class="nav-link active">
+                    Trends
+                </a>
+
+                <a href="nearby.html" class="nav-link">
+                    Nearby
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+
+        <!-- PAGE HERO -->
+
+        <section class="trends-page-hero">
+
+            <div class="container">
+
+                <span class="section-kicker">
+                    📈 MARKET INTELLIGENCE
+                </span>
+
+                <h1>
+                    Commodity Price Trends
+                </h1>
+
+                <p>
+                    Track agricultural price movements across
+                    Pune mandi markets.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TRENDS SECTION
+        ================================================== -->
+
+        <section id="trends" class="trends-section">
+
+            <div class="container">
+
+
+                <!-- FILTER CARD -->
+
+                <div class="trend-filter-card">
+
+
+                    <div class="filter-group">
+
+                        <label for="trendCommodity">
+                            Commodity
+                        </label>
+
+                        <select id="trendCommodity">
+                            <option value="Onion">
+                                Onion
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="trendMarket">
+                            Market
+                        </label>
+
+                        <select id="trendMarket">
+
+                            <option value="">
+                                All Markets
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="trendVariety">
+                            Variety
+                        </label>
+
+                        <select id="trendVariety">
+
+                            <option value="">
+                                All Varieties
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PERIOD -->
+
+                <div class="trend-period-wrapper">
+
+                    <span class="trend-period-label">
+                        Time Period
+                    </span>
+
+                    <div class="trend-periods">
+
+                        <button
+                            class="trend-period"
+                            data-days="7"
+                            type="button"
+                        >
+                            7 Days
+                        </button>
+
+                        <button
+                            class="trend-period"
+                            data-days="30"
+                            type="button"
+                        >
+                            30 Days
+                        </button>
+
+                        <button
+                            class="trend-period"
+                            data-days="90"
+                            type="button"
+                        >
+                            90 Days
+                        </button>
+
+                        <button
+                            class="trend-period"
+                            data-days="365"
+                            type="button"
+                        >
+                            1 Year
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     SUMMARY CARDS
+                ================================================== -->
+
+                <div class="trend-summary-grid">
+
+
+                    <!-- CURRENT PRICE -->
+
+                    <div class="trend-summary-card">
+
+                        <span class="trend-summary-label">
+                            Current Modal Price
+                        </span>
+
+                        <strong
+                            id="trendCurrentPrice"
+                            class="trend-summary-value"
+                        >
+                            —
+                        </strong>
+
+                        <span
+                            id="trendCurrentDate"
+                            class="trend-summary-meta"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <!-- CHANGE -->
+
+                    <div class="trend-summary-card">
+
+                        <span class="trend-summary-label">
+                            Price Change
+                        </span>
+
+                        <strong
+                            id="trendPriceChange"
+                            class="trend-summary-value"
+                        >
+                            —
+                        </strong>
+
+                        <span class="trend-summary-meta">
+                            Selected period
+                        </span>
+
+                    </div>
+
+
+                    <!-- DIRECTION -->
+
+                    <div class="trend-summary-card">
+
+                        <span class="trend-summary-label">
+                            Direction
+                        </span>
+
+                        <strong
+                            id="trendDirection"
+                            class="trend-summary-value"
+                        >
+                            —
+                        </strong>
+
+                        <span
+                            id="trendStatus"
+                            class="trend-status trend-neutral"
+                        >
+                            Loading...
+                        </span>
+
+                    </div>
+
+
+                    <!-- RANGE -->
+
+                    <div class="trend-summary-card">
+
+                        <span class="trend-summary-label">
+                            Price Range
+                        </span>
+
+                        <strong
+                            class="trend-summary-range"
+                        >
+                            <span id="trendMinPrice">
+                                —
+                            </span>
+
+                            <span>
+                                –
+                            </span>
+
+                            <span id="trendMaxPrice">
+                                —
+                            </span>
+                        </strong>
+
+                        <span class="trend-summary-meta">
+                            Period low / high
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CHART
+                ================================================== -->
+
+                <div class="trend-chart-card">
+
+                    <div class="trend-chart-header">
+
+                        <div>
+
+                            <h2>
+                                Price Movement
+                            </h2>
+
+                            <p>
+                                Minimum, maximum and modal prices
+                                over the selected period.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-wrapper">
+
+                        <canvas
+                            id="priceTrendChart"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <div class="footer-bottom">
+
+                <span>
+                    © 2026 MandiPlus
+                </span>
+
+                <span>
+                    Agricultural Market Intelligence
+                </span>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="../js/api.js"></script>
+    <script src="../js/trends.js"></script>
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                if (
+                    window.MandiPlusTrends &&
+                    typeof window.MandiPlusTrends.initialize === "function"
+                ) {
+
+                    window.MandiPlusTrends.initialize();
+
+                }
+
+            }
+        );
+    </script>
+
+</body>
+
+</html>

@@ -1,13 +1,25 @@
 /**
  * MandiPlus Trends
  * Dynamic commodity + market + variety trend analysis
+ *
+ * Scope:
+ * - Pune district
+ * - One commodity at a time
+ * - Optional market filter
+ * - Optional variety filter
+ * - 7 / 30 / 90 / 365 day periods
  */
 
 const TrendsState = {
     chart: null,
     days: 7,
 
+    // Default commodity
     commodity: "Onion",
+
+    // Pune is currently the application scope
+    district: "Pune",
+
     market: "",
     variety: "",
 
@@ -23,6 +35,7 @@ function $(selector) {
     return document.querySelector(selector);
 }
 
+
 function $$(selector) {
     return document.querySelectorAll(selector);
 }
@@ -33,6 +46,7 @@ function $$(selector) {
 // ============================================================
 
 function formatPrice(value) {
+
     const number = Number(value);
 
     if (!Number.isFinite(number)) {
@@ -46,6 +60,7 @@ function formatPrice(value) {
 
 
 function formatPercent(value) {
+
     const number = Number(value);
 
     if (!Number.isFinite(number)) {
@@ -57,6 +72,7 @@ function formatPercent(value) {
 
 
 function formatDate(dateString) {
+
     if (!dateString) {
         return "—";
     }
@@ -75,6 +91,7 @@ function formatDate(dateString) {
 
 
 function escapeHTML(value) {
+
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -93,41 +110,55 @@ function showTrendLoading() {
     const status = $("#trendStatus");
 
     if (status) {
+
         status.textContent = "Loading...";
-        status.className = "trend-status trend-neutral";
+        status.className =
+            "trend-status trend-neutral";
     }
 
-    const currentPrice = $("#trendCurrentPrice");
+
+    const currentPrice =
+        $("#trendCurrentPrice");
 
     if (currentPrice) {
         currentPrice.textContent = "Loading...";
     }
 
-    const currentDate = $("#trendCurrentDate");
+
+    const currentDate =
+        $("#trendCurrentDate");
 
     if (currentDate) {
         currentDate.textContent = "—";
     }
 
-    const priceChange = $("#trendPriceChange");
+
+    const priceChange =
+        $("#trendPriceChange");
 
     if (priceChange) {
         priceChange.textContent = "—";
     }
 
-    const direction = $("#trendDirection");
+
+    const direction =
+        $("#trendDirection");
 
     if (direction) {
         direction.textContent = "—";
     }
 
-    const minPrice = $("#trendMinPrice");
+
+    const minPrice =
+        $("#trendMinPrice");
 
     if (minPrice) {
         minPrice.textContent = "—";
     }
 
-    const maxPrice = $("#trendMaxPrice");
+
+    const maxPrice =
+        $("#trendMaxPrice");
 
     if (maxPrice) {
         maxPrice.textContent = "—";
@@ -144,11 +175,15 @@ function showTrendError(message) {
     const status = $("#trendStatus");
 
     if (status) {
+
         status.textContent = "Unavailable";
-        status.className = "trend-status trend-neutral";
+        status.className =
+            "trend-status trend-neutral";
     }
 
-    const chartWrapper = document.querySelector(".chart-wrapper");
+
+    const chartWrapper =
+        document.querySelector(".chart-wrapper");
 
     if (chartWrapper) {
 
@@ -179,13 +214,17 @@ function showTrendError(message) {
 
 function ensureChartCanvas() {
 
-    const chartWrapper = document.querySelector(".chart-wrapper");
+    const chartWrapper =
+        document.querySelector(".chart-wrapper");
 
     if (!chartWrapper) {
         return null;
     }
 
-    let canvas = $("#priceTrendChart");
+
+    let canvas =
+        $("#priceTrendChart");
+
 
     if (!canvas) {
 
@@ -193,10 +232,30 @@ function ensureChartCanvas() {
             <canvas id="priceTrendChart"></canvas>
         `;
 
-        canvas = $("#priceTrendChart");
+        canvas =
+            $("#priceTrendChart");
     }
 
+
     return canvas;
+}
+
+
+// ============================================================
+// API RESPONSE HELPERS
+// ============================================================
+
+function extractArray(response) {
+
+    if (Array.isArray(response)) {
+        return response;
+    }
+
+    if (Array.isArray(response?.data)) {
+        return response.data;
+    }
+
+    return [];
 }
 
 
@@ -213,10 +272,13 @@ async function loadTrendFilters() {
             mandisResponse,
             ratesResponse
         ] = await Promise.all([
+
             window.MandiPlusAPI.getCommodities(),
+
             window.MandiPlusAPI.getMandis(),
+
             window.MandiPlusAPI.getRates({
-                district: "Pune",
+                district: TrendsState.district,
                 commodity: TrendsState.commodity
             })
         ]);
@@ -227,13 +289,13 @@ async function loadTrendFilters() {
         // ----------------------------------------------------
 
         const commodities =
-            Array.isArray(commoditiesResponse)
-                ? commoditiesResponse
-                : Array.isArray(commoditiesResponse?.data)
-                    ? commoditiesResponse.data
-                    : [];
+            extractArray(
+                commoditiesResponse
+            );
 
-        populateCommodityFilter(commodities);
+        populateCommodityFilter(
+            commodities
+        );
 
 
         // ----------------------------------------------------
@@ -241,13 +303,13 @@ async function loadTrendFilters() {
         // ----------------------------------------------------
 
         const mandis =
-            Array.isArray(mandisResponse)
-                ? mandisResponse
-                : Array.isArray(mandisResponse?.data)
-                    ? mandisResponse.data
-                    : [];
+            extractArray(
+                mandisResponse
+            );
 
-        populateMarketFilter(mandis);
+        populateMarketFilter(
+            mandis
+        );
 
 
         // ----------------------------------------------------
@@ -255,13 +317,13 @@ async function loadTrendFilters() {
         // ----------------------------------------------------
 
         const rates =
-            Array.isArray(ratesResponse)
-                ? ratesResponse
-                : Array.isArray(ratesResponse?.data)
-                    ? ratesResponse.data
-                    : [];
+            extractArray(
+                ratesResponse
+            );
 
-        populateVarietyFilter(rates);
+        populateVarietyFilter(
+            rates
+        );
 
     } catch (error) {
 
@@ -277,46 +339,67 @@ async function loadTrendFilters() {
 // COMMODITY FILTER
 // ============================================================
 
-function populateCommodityFilter(commodities) {
+function populateCommodityFilter(
+    commodities
+) {
 
-    const select = $("#trendCommodity");
+    const select =
+        $("#trendCommodity");
 
     if (!select) {
         return;
     }
 
+
     select.innerHTML = "";
 
-    commodities.forEach(commodity => {
 
-        const name =
-            commodity.name ||
-            commodity.commodity;
+    commodities.forEach(
+        commodity => {
 
-        if (!name) {
-            return;
+            const name =
+                commodity.name ||
+                commodity.commodity;
+
+
+            if (!name) {
+                return;
+            }
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                name;
+
+            option.textContent =
+                name;
+
+
+            if (
+                name.toLowerCase() ===
+                TrendsState.commodity.toLowerCase()
+            ) {
+
+                option.selected = true;
+            }
+
+
+            select.appendChild(
+                option
+            );
         }
+    );
 
-        const option =
-            document.createElement("option");
 
-        option.value = name;
-        option.textContent = name;
+    // --------------------------------------------------------
+    // FALLBACK
+    // --------------------------------------------------------
 
-        if (
-            name.toLowerCase() ===
-            TrendsState.commodity.toLowerCase()
-        ) {
-            option.selected = true;
-        }
-
-        select.appendChild(option);
-    });
-
-    /*
-     * If selected commodity isn't available,
-     * use the first available commodity.
-     */
     if (
         select.options.length &&
         ![...select.options].some(
@@ -339,16 +422,21 @@ function populateCommodityFilter(commodities) {
 // MARKET FILTER
 // ============================================================
 
-function populateMarketFilter(mandis) {
+function populateMarketFilter(
+    mandis
+) {
 
-    const select = $("#trendMarket");
+    const select =
+        $("#trendMarket");
 
     if (!select) {
         return;
     }
 
+
     const currentValue =
         TrendsState.market;
+
 
     select.innerHTML = `
         <option value="">
@@ -356,28 +444,79 @@ function populateMarketFilter(mandis) {
         </option>
     `;
 
+
     mandis
-        .filter(mandi =>
-            !mandi.district ||
-            mandi.district === "Pune"
+        .filter(mandi => {
+
+            /*
+             * Since Trends is currently Pune-focused,
+             * only display Pune mandis.
+             */
+
+            return (
+                !mandi.district ||
+                String(mandi.district)
+                    .toLowerCase() ===
+                TrendsState.district.toLowerCase()
+            );
+        })
+        .sort(
+            (a, b) =>
+                String(a.name)
+                    .localeCompare(
+                        String(b.name)
+                    )
         )
-        .sort((a, b) =>
-            String(a.name).localeCompare(
-                String(b.name)
-            )
-        )
-        .forEach(mandi => {
+        .forEach(
+            mandi => {
 
-            const option =
-                document.createElement("option");
+                if (!mandi.name) {
+                    return;
+                }
 
-            option.value = mandi.name;
-            option.textContent = mandi.name;
 
-            select.appendChild(option);
-        });
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
-    select.value = currentValue;
+
+                option.value =
+                    mandi.name;
+
+                option.textContent =
+                    mandi.name;
+
+
+                select.appendChild(
+                    option
+                );
+            }
+        );
+
+
+    /*
+     * Restore selected market
+     * if it still exists.
+     */
+
+    select.value =
+        currentValue;
+
+
+    /*
+     * If previous market no longer exists,
+     * reset it.
+     */
+
+    if (
+        select.value !==
+        currentValue
+    ) {
+
+        TrendsState.market = "";
+        select.value = "";
+    }
 }
 
 
@@ -385,24 +524,35 @@ function populateMarketFilter(mandis) {
 // VARIETY FILTER
 // ============================================================
 
-function populateVarietyFilter(rates) {
+function populateVarietyFilter(
+    rates
+) {
 
-    const select = $("#trendVariety");
+    const select =
+        $("#trendVariety");
 
     if (!select) {
         return;
     }
 
+
     const varieties = [
         ...new Set(
             rates
-                .map(rate => rate.variety)
-                .filter(Boolean)
+                .map(
+                    rate =>
+                        rate.variety
+                )
+                .filter(
+                    Boolean
+                )
         )
     ].sort();
 
+
     const currentValue =
         TrendsState.variety;
+
 
     select.innerHTML = `
         <option value="">
@@ -410,18 +560,42 @@ function populateVarietyFilter(rates) {
         </option>
     `;
 
-    varieties.forEach(variety => {
 
-        const option =
-            document.createElement("option");
+    varieties.forEach(
+        variety => {
 
-        option.value = variety;
-        option.textContent = variety;
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        select.appendChild(option);
-    });
 
-    select.value = currentValue;
+            option.value =
+                variety;
+
+            option.textContent =
+                variety;
+
+
+            select.appendChild(
+                option
+            );
+        }
+    );
+
+
+    select.value =
+        currentValue;
+
+
+    if (
+        select.value !==
+        currentValue
+    ) {
+
+        TrendsState.variety = "";
+        select.value = "";
+    }
 }
 
 
@@ -433,20 +607,50 @@ async function loadTrends() {
 
     showTrendLoading();
 
+
     try {
 
+        // ----------------------------------------------------
+        // Validate commodity
+        // ----------------------------------------------------
+
+        if (
+            !TrendsState.commodity ||
+            !TrendsState.commodity.trim()
+        ) {
+
+            throw new Error(
+                "Please select a commodity."
+            );
+        }
+
+
+        // ----------------------------------------------------
+        // Build API parameters
+        // ----------------------------------------------------
+
         const params = {
-            commodity: TrendsState.commodity,
-            district: "Pune",
-            days: TrendsState.days
+
+            commodity:
+                TrendsState.commodity,
+
+            district:
+                TrendsState.district,
+
+            days:
+                TrendsState.days
         };
 
+
         if (TrendsState.market) {
+
             params.market =
                 TrendsState.market;
         }
 
+
         if (TrendsState.variety) {
+
             params.variety =
                 TrendsState.variety;
         }
@@ -458,31 +662,61 @@ async function loadTrends() {
         );
 
 
+        // ----------------------------------------------------
+        // API request
+        // ----------------------------------------------------
+
         const response =
             await window.MandiPlusAPI.getTrends(
                 params
             );
 
 
+        // ----------------------------------------------------
+        // Validate response
+        // ----------------------------------------------------
+
+        if (
+            response?.success === false
+        ) {
+
+            throw new Error(
+                response.message ||
+                response.detail ||
+                "Trend API returned an error."
+            );
+        }
+
+
         const trendData =
-            Array.isArray(response)
-                ? response
-                : Array.isArray(response?.data)
-                    ? response.data
-                    : [];
+            extractArray(
+                response
+            );
 
 
         if (!trendData.length) {
 
             showTrendError(
-                `No trend data is available for ${TrendsState.commodity}.`
+                `No trend data is available for ${TrendsState.commodity} in ${TrendsState.district}.`
             );
 
             return;
         }
 
 
-        renderTrendSummary(response, trendData);
+        // ----------------------------------------------------
+        // Render summary
+        // ----------------------------------------------------
+
+        renderTrendSummary(
+            response,
+            trendData
+        );
+
+
+        // ----------------------------------------------------
+        // Render chart
+        // ----------------------------------------------------
 
         renderTrendChart(
             trendData
@@ -496,6 +730,7 @@ async function loadTrends() {
             error
         );
 
+
         showTrendError(
             error.message ||
             "Unable to load trend data."
@@ -508,7 +743,10 @@ async function loadTrends() {
 // TREND SUMMARY
 // ============================================================
 
-function renderTrendSummary(response, data) {
+function renderTrendSummary(
+    response,
+    data
+) {
 
     /*
      * Backend returns data sorted by date.
@@ -516,29 +754,6 @@ function renderTrendSummary(response, data) {
 
     const latest =
         data[data.length - 1];
-
-    const modalPrices =
-        data
-            .map(item =>
-                Number(item.modal_price)
-            )
-            .filter(Number.isFinite);
-
-
-    const minPrices =
-        data
-            .map(item =>
-                Number(item.min_price)
-            )
-            .filter(Number.isFinite);
-
-
-    const maxPrices =
-        data
-            .map(item =>
-                Number(item.max_price)
-            )
-            .filter(Number.isFinite);
 
 
     // --------------------------------------------------------
@@ -600,8 +815,10 @@ function renderTrendSummary(response, data) {
 
         const trend =
             String(
-                response.trend || "stable"
+                response.trend ||
+                "stable"
             ).toLowerCase();
+
 
         direction.textContent =
             trend === "up"
@@ -621,10 +838,23 @@ function renderTrendSummary(response, data) {
 
     if (minPrice) {
 
+        const values =
+            data
+                .map(
+                    item =>
+                        Number(
+                            item.min_price
+                        )
+                )
+                .filter(
+                    Number.isFinite
+                );
+
+
         minPrice.textContent =
-            minPrices.length
+            values.length
                 ? formatPrice(
-                    Math.min(...minPrices)
+                    Math.min(...values)
                 )
                 : "—";
     }
@@ -639,10 +869,23 @@ function renderTrendSummary(response, data) {
 
     if (maxPrice) {
 
+        const values =
+            data
+                .map(
+                    item =>
+                        Number(
+                            item.max_price
+                        )
+                )
+                .filter(
+                    Number.isFinite
+                );
+
+
         maxPrice.textContent =
-            maxPrices.length
+            values.length
                 ? formatPrice(
-                    Math.max(...maxPrices)
+                    Math.max(...values)
                 )
                 : "—";
     }
@@ -659,11 +902,14 @@ function renderTrendSummary(response, data) {
 
         const trend =
             String(
-                response.trend || "stable"
+                response.trend ||
+                "stable"
             ).toLowerCase();
+
 
         status.className =
             "trend-status";
+
 
         if (trend === "up") {
 
@@ -674,7 +920,9 @@ function renderTrendSummary(response, data) {
             status.textContent =
                 "↑ Price Rising";
 
-        } else if (trend === "down") {
+        } else if (
+            trend === "down"
+        ) {
 
             status.classList.add(
                 "trend-down"
@@ -704,6 +952,7 @@ function renderTrendSummary(response, data) {
             "#trends .section-heading h2"
         );
 
+
     if (heading) {
 
         heading.textContent =
@@ -715,6 +964,7 @@ function renderTrendSummary(response, data) {
         document.querySelector(
             "#trends .section-heading p"
         );
+
 
     if (description) {
 
@@ -728,17 +978,22 @@ function renderTrendSummary(response, data) {
 // CHART
 // ============================================================
 
-function renderTrendChart(data) {
+function renderTrendChart(
+    data
+) {
 
     const canvas =
         ensureChartCanvas();
+
 
     if (!canvas) {
         return;
     }
 
+
     if (
-        typeof Chart === "undefined"
+        typeof Chart ===
+        "undefined"
     ) {
 
         console.error(
@@ -749,45 +1004,68 @@ function renderTrendChart(data) {
     }
 
 
+    // --------------------------------------------------------
+    // Chart data
+    // --------------------------------------------------------
+
     const labels =
-        data.map(item =>
-            formatDate(item.date)
+        data.map(
+            item =>
+                formatDate(
+                    item.date
+                )
         );
 
 
     const modalPrices =
-        data.map(item =>
-            Number(item.modal_price)
+        data.map(
+            item =>
+                Number(
+                    item.modal_price
+                )
         );
 
 
     const minPrices =
-        data.map(item =>
-            Number(item.min_price)
+        data.map(
+            item =>
+                Number(
+                    item.min_price
+                )
         );
 
 
     const maxPrices =
-        data.map(item =>
-            Number(item.max_price)
+        data.map(
+            item =>
+                Number(
+                    item.max_price
+                )
         );
 
 
-    /*
-     * Destroy previous chart.
-     */
+    // --------------------------------------------------------
+    // Destroy previous chart
+    // --------------------------------------------------------
+
     if (TrendsState.chart) {
 
         TrendsState.chart.destroy();
 
-        TrendsState.chart = null;
+        TrendsState.chart =
+            null;
     }
 
+
+    // --------------------------------------------------------
+    // Create chart
+    // --------------------------------------------------------
 
     TrendsState.chart =
         new Chart(
             canvas.getContext("2d"),
             {
+
                 type: "line",
 
                 data: {
@@ -797,75 +1075,107 @@ function renderTrendChart(data) {
                     datasets: [
 
                         {
-                            label: "Modal Price",
+                            label:
+                                "Modal Price",
 
-                            data: modalPrices,
+                            data:
+                                modalPrices,
 
-                            borderWidth: 3,
+                            borderWidth:
+                                3,
 
-                            tension: 0.35,
+                            tension:
+                                0.35,
 
-                            pointRadius: 4,
+                            pointRadius:
+                                4,
 
-                            pointHoverRadius: 6
+                            pointHoverRadius:
+                                6
                         },
 
+
                         {
-                            label: "Minimum Price",
+                            label:
+                                "Minimum Price",
 
-                            data: minPrices,
+                            data:
+                                minPrices,
 
-                            borderWidth: 2,
+                            borderWidth:
+                                2,
 
-                            borderDash: [6, 5],
+                            borderDash:
+                                [6, 5],
 
-                            tension: 0.35,
+                            tension:
+                                0.35,
 
-                            pointRadius: 2
+                            pointRadius:
+                                2
                         },
 
+
                         {
-                            label: "Maximum Price",
+                            label:
+                                "Maximum Price",
 
-                            data: maxPrices,
+                            data:
+                                maxPrices,
 
-                            borderWidth: 2,
+                            borderWidth:
+                                2,
 
-                            borderDash: [6, 5],
+                            borderDash:
+                                [6, 5],
 
-                            tension: 0.35,
+                            tension:
+                                0.35,
 
-                            pointRadius: 2
+                            pointRadius:
+                                2
                         }
 
                     ]
                 },
 
+
                 options: {
 
-                    responsive: true,
+                    responsive:
+                        true,
 
-                    maintainAspectRatio: false,
+                    maintainAspectRatio:
+                        false,
 
                     interaction: {
-                        mode: "index",
-                        intersect: false
+
+                        mode:
+                            "index",
+
+                        intersect:
+                            false
                     },
+
 
                     plugins: {
 
                         legend: {
-                            position: "top"
+
+                            position:
+                                "top"
                         },
+
 
                         tooltip: {
 
                             callbacks: {
 
-                                label: context => {
+                                label:
+                                    context => {
 
-                                    return `${context.dataset.label}: ${formatPrice(context.raw)}`;
-                                }
+                                        return `${context.dataset.label}: ${formatPrice(context.raw)}`;
+                                    }
 
                             }
 
@@ -873,30 +1183,38 @@ function renderTrendChart(data) {
 
                     },
 
+
                     scales: {
 
                         y: {
 
-                            beginAtZero: false,
+                            beginAtZero:
+                                false,
 
                             ticks: {
 
-                                callback: value =>
-                                    formatPrice(value)
-
+                                callback:
+                                    value =>
+                                        formatPrice(
+                                            value
+                                        )
                             }
 
                         },
 
+
                         x: {
 
                             grid: {
-                                display: false
+
+                                display:
+                                    false
                             }
 
                         }
 
                     }
+
                 }
             }
         );
@@ -916,9 +1234,11 @@ function initializeCommodityEvent() {
             const commodity =
                 event.detail?.commodity;
 
+
             if (!commodity) {
                 return;
             }
+
 
             console.info(
                 "[MandiPlus Trends] Commodity changed:",
@@ -929,21 +1249,22 @@ function initializeCommodityEvent() {
             TrendsState.commodity =
                 commodity;
 
-            /*
-             * Reset market and variety because
-             * they belong to the previous commodity.
-             */
+
+            // ------------------------------------------------
+            // Reset dependent filters
+            // ------------------------------------------------
 
             TrendsState.market = "";
             TrendsState.variety = "";
 
 
-            /*
-             * Update commodity selector.
-             */
+            // ------------------------------------------------
+            // Update commodity selector
+            // ------------------------------------------------
 
             const commoditySelect =
                 $("#trendCommodity");
+
 
             if (commoditySelect) {
 
@@ -951,9 +1272,12 @@ function initializeCommodityEvent() {
                     [...commoditySelect.options]
                         .some(
                             option =>
-                                option.value.toLowerCase() ===
-                                commodity.toLowerCase()
+                                option.value
+                                    .toLowerCase() ===
+                                commodity
+                                    .toLowerCase()
                         );
+
 
                 if (!exists) {
 
@@ -962,51 +1286,57 @@ function initializeCommodityEvent() {
                             "option"
                         );
 
+
                     option.value =
                         commodity;
 
                     option.textContent =
                         commodity;
 
+
                     commoditySelect.appendChild(
                         option
                     );
                 }
+
 
                 commoditySelect.value =
                     commodity;
             }
 
 
-            /*
-             * Reload markets and varieties
-             * for the selected commodity.
-             */
+            // ------------------------------------------------
+            // Reload filters
+            // ------------------------------------------------
 
             await loadTrendFilters();
 
 
-            /*
-             * Load new trend data.
-             */
+            // ------------------------------------------------
+            // Reload trend
+            // ------------------------------------------------
 
             await loadTrends();
 
 
-            /*
-             * Scroll trend section into view
-             * only when the user selected a
-             * commodity from the dashboard.
-             */
+            // ------------------------------------------------
+            // Scroll to Trends
+            // ------------------------------------------------
 
             const trendSection =
-                document.querySelector("#trends");
+                document.querySelector(
+                    "#trends"
+                );
+
 
             if (trendSection) {
 
                 trendSection.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
+                    behavior:
+                        "smooth",
+
+                    block:
+                        "start"
                 });
             }
 
@@ -1021,8 +1351,13 @@ function initializeCommodityEvent() {
 
 function initializeFilterEvents() {
 
+    // --------------------------------------------------------
+    // Commodity
+    // --------------------------------------------------------
+
     const commoditySelect =
         $("#trendCommodity");
+
 
     if (commoditySelect) {
 
@@ -1033,8 +1368,13 @@ function initializeFilterEvents() {
                 TrendsState.commodity =
                     event.target.value;
 
-                TrendsState.market = "";
-                TrendsState.variety = "";
+
+                TrendsState.market =
+                    "";
+
+                TrendsState.variety =
+                    "";
+
 
                 await loadTrendFilters();
 
@@ -1044,8 +1384,13 @@ function initializeFilterEvents() {
     }
 
 
+    // --------------------------------------------------------
+    // Market
+    // --------------------------------------------------------
+
     const marketSelect =
         $("#trendMarket");
+
 
     if (marketSelect) {
 
@@ -1056,14 +1401,20 @@ function initializeFilterEvents() {
                 TrendsState.market =
                     event.target.value;
 
+
                 await loadTrends();
             }
         );
     }
 
 
+    // --------------------------------------------------------
+    // Variety
+    // --------------------------------------------------------
+
     const varietySelect =
         $("#trendVariety");
+
 
     if (varietySelect) {
 
@@ -1074,53 +1425,57 @@ function initializeFilterEvents() {
                 TrendsState.variety =
                     event.target.value;
 
+
                 await loadTrends();
             }
         );
     }
 
 
-    /*
-     * 7 / 30 / 90 / 365 days
-     */
+    // --------------------------------------------------------
+    // Time period
+    // --------------------------------------------------------
 
-    $$(".trend-period").forEach(button => {
+    $$(".trend-period").forEach(
+        button => {
 
-        button.addEventListener(
-            "click",
-            async () => {
+            button.addEventListener(
+                "click",
+                async () => {
 
-                const days =
-                    Number(
-                        button.dataset.days
+                    const days =
+                        Number(
+                            button.dataset.days
+                        );
+
+
+                    if (!days) {
+                        return;
+                    }
+
+
+                    TrendsState.days =
+                        days;
+
+
+                    $$(".trend-period").forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
                     );
 
-                if (!days) {
-                    return;
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    await loadTrends();
                 }
-
-
-                TrendsState.days =
-                    days;
-
-
-                $$(".trend-period").forEach(
-                    item =>
-                        item.classList.remove(
-                            "active"
-                        )
-                );
-
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                await loadTrends();
-            }
-        );
-    });
+            );
+        }
+    );
 }
 
 
@@ -1130,36 +1485,52 @@ function initializeFilterEvents() {
 
 async function initialize() {
 
-    if (TrendsState.initialized) {
+    if (
+        TrendsState.initialized
+    ) {
         return;
     }
 
-    TrendsState.initialized = true;
+
+    TrendsState.initialized =
+        true;
+
 
     console.info(
         "[MandiPlus Trends] Initializing..."
     );
 
 
-    /*
-     * Set default period button.
-     */
+    // --------------------------------------------------------
+    // Default period button
+    // --------------------------------------------------------
 
     const defaultPeriod =
         document.querySelector(
             `.trend-period[data-days="${TrendsState.days}"]`
         );
 
+
     if (defaultPeriod) {
+
         defaultPeriod.classList.add(
             "active"
         );
     }
 
 
+    // --------------------------------------------------------
+    // Events
+    // --------------------------------------------------------
+
     initializeCommodityEvent();
+
     initializeFilterEvents();
 
+
+    // --------------------------------------------------------
+    // Initial data
+    // --------------------------------------------------------
 
     await loadTrendFilters();
 
@@ -1179,12 +1550,16 @@ async function initialize() {
 window.MandiPlusTrends = {
 
     initialize,
-    load: loadTrends,
+
+    load:
+        loadTrends,
+
     loadTrends,
 
     loadTrendFilters,
 
-    state: TrendsState
+    state:
+        TrendsState
 };
 
 

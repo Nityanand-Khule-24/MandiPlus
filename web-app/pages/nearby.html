@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =====================================================
+         BASIC DOCUMENT SETTINGS
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Find nearby agricultural mandis and compare current commodity prices with MandiPlus."
+    >
+
+    <meta
+        name="keywords"
+        content="MandiPlus, nearby mandi, agricultural markets, mandi prices, farmers, India"
+    >
+
+    <title>
+        Nearby Mandis | MandiPlus
+    </title>
+
+
+    <!-- =====================================================
+         STYLESHEETS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER / NAVIGATION
+         ===================================================== -->
+
+    <header class="site-header">
+
+        <div class="container navbar">
+
+
+            <!-- BRAND -->
+
+            <a
+                href="../index.html"
+                class="brand"
+            >
+
+                <span class="brand-icon">
+                    🌾
+                </span>
+
+                <span>
+                    MandiPlus
+                </span>
+
+            </a>
+
+
+            <!-- DESKTOP NAVIGATION -->
+
+            <nav class="desktop-nav">
+
+                <a
+                    href="../index.html"
+                    class="nav-link"
+                >
+                    Dashboard
+                </a>
+
+                <a
+                    href="prices.html"
+                    class="nav-link"
+                >
+                    Prices
+                </a>
+
+                <a
+                    href="markets.html"
+                    class="nav-link"
+                >
+                    Markets
+                </a>
+
+                <a
+                    href="trends.html"
+                    class="nav-link"
+                >
+                    Trends
+                </a>
+
+                <a
+                    href="nearby.html"
+                    class="nav-link active"
+                >
+                    Nearby
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main>
+
+
+        <!-- =================================================
+             HERO SECTION
+             ================================================= -->
+
+        <section class="nearby-page-hero">
+
+            <div class="container">
+
+                <div class="nearby-hero-content">
+
+
+                    <span class="section-eyebrow">
+                        📍 LOCATION-BASED MARKET DISCOVERY
+                    </span>
+
+
+                    <h1>
+                        Nearby Mandi Markets
+                    </h1>
+
+
+                    <p>
+                        Discover agricultural markets near your
+                        current location and compare the latest
+                        commodity prices.
+                    </p>
+
+
+                    <div class="nearby-hero-note">
+
+                        <span>
+                            🌾
+                        </span>
+
+                        <span>
+                            Find the nearest markets and make
+                            better selling decisions.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             LOCATION SECTION
+             ================================================= -->
+
+        <section class="nearby-location-section">
+
+            <div class="container">
+
+                <div class="nearby-location-card">
+
+
+                    <!-- LOCATION INFORMATION -->
+
+                    <div class="nearby-location-info">
+
+
+                        <div class="nearby-location-icon">
+                            📍
+                        </div>
+
+
+                        <div>
+
+                            <span class="nearby-label">
+                                Your Location
+                            </span>
+
+
+                            <h2 id="nearbyLocation">
+                                Detecting your location...
+                            </h2>
+
+
+                            <p id="nearbyLocationStatus">
+                                Allow location access to find
+                                nearby mandi markets.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- LOCATION BUTTON -->
+
+                    <button
+    id="locationButton"
+    type="button"
+    class="primary-button"
+>
+    📍 Detect Location
+</button>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             COMMODITY SECTION
+             ================================================= -->
+
+        <section class="nearby-commodity-section">
+
+            <div class="container">
+
+
+                <div class="nearby-commodity-card">
+
+
+                    <div class="nearby-commodity-heading">
+
+
+                        <span class="section-eyebrow">
+                            CURRENT COMMODITY
+                        </span>
+
+
+                        <h2>
+                            Nearby
+                            <span id="nearbyCommodityName">
+                                Onion
+                            </span>
+                            Markets
+                        </h2>
+
+
+                        <p>
+                            Showing the latest available
+                            <strong id="nearbyCommodityText">
+                                Onion
+                            </strong>
+                            prices from nearby mandis.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- COMMODITY SELECTOR -->
+
+                    <div class="filter-group">
+
+                        <label for="nearbyCommodity">
+
+                            Select Commodity
+
+                        </label>
+
+
+                        <select
+                            id="nearbyCommodity"
+                            name="nearbyCommodity"
+                        >
+
+                            <option value="Onion">
+                                Onion
+                            </option>
+
+                            <option value="Onion Green">
+                                Onion Green
+                            </option>
+
+                            <option value="Tomato">
+                                Tomato
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             NEARBY MARKET RESULTS
+             ================================================= -->
+
+        <section
+            id="nearby"
+            class="nearby-markets-section"
+        >
+
+            <div class="container">
+
+
+                <!-- SECTION HEADING -->
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            MARKET DISCOVERY
+                        </span>
+
+
+                        <h2>
+                            Nearest Mandis
+                        </h2>
+
+
+                        <p>
+                            Markets are ranked by distance from
+                            your detected location.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     NEARBY MANDI CONTAINER
+
+                     IMPORTANT:
+                     nearby.js specifically searches for:
+
+                         #nearbyMandis
+
+                     Do not change this ID.
+                     ================================================= -->
+
+                <div
+                    id="nearbyMandis"
+                    class="nearby-mandis-container"
+                >
+
+                    <!-- JavaScript renders mandi cards here -->
+
+                    <div class="nearby-empty">
+
+                        <div class="nearby-empty-icon">
+                            📍
+                        </div>
+
+
+                        <h3>
+                            Detect your location
+                        </h3>
+
+
+                        <p>
+                            Allow location access to find the
+                            nearest mandi markets.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             HOW IT WORKS
+             ================================================= -->
+
+        <section class="nearby-how-section">
+
+            <div class="container">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="section-eyebrow">
+                            HOW IT WORKS
+                        </span>
+
+
+                        <h2>
+                            Find the Right Market
+                        </h2>
+
+
+                        <p>
+                            MandiPlus uses your location and
+                            current market data to help you
+                            compare nearby mandis.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="nearby-how-grid">
+
+
+                    <!-- STEP 1 -->
+
+                    <article class="nearby-how-card">
+
+                        <div class="nearby-how-icon">
+                            📍
+                        </div>
+
+
+                        <h3>
+                            1. Detect Location
+                        </h3>
+
+
+                        <p>
+                            Your browser location is used to
+                            calculate the distance to available
+                            mandi markets.
+                        </p>
+
+                    </article>
+
+
+
+                    <!-- STEP 2 -->
+
+                    <article class="nearby-how-card">
+
+                        <div class="nearby-how-icon">
+                            🌾
+                        </div>
+
+
+                        <h3>
+                            2. Select Commodity
+                        </h3>
+
+
+                        <p>
+                            Choose the crop you want to check,
+                            such as Onion, Onion Green or Tomato.
+                        </p>
+
+                    </article>
+
+
+
+                    <!-- STEP 3 -->
+
+                    <article class="nearby-how-card">
+
+                        <div class="nearby-how-icon">
+                            💰
+                        </div>
+
+
+                        <h3>
+                            3. Compare Prices
+                        </h3>
+
+
+                        <p>
+                            Compare the latest modal, minimum
+                            and maximum prices from nearby mandis.
+                        </p>
+
+                    </article>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+
+            <div class="footer-content">
+
+
+                <div>
+
+                    <a
+                        href="../index.html"
+                        class="brand"
+                    >
+
+                        <span class="brand-icon">
+                            🌾
+                        </span>
+
+                        <span>
+                            MandiPlus
+                        </span>
+
+                    </a>
+
+
+                    <p>
+                        Agricultural market intelligence
+                        for better price decisions.
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p>
+                        © 2026 MandiPlus
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+
+    <!-- API CLIENT -->
+
+    <script src="../js/api.js"></script>
+
+
+    <!-- LOCATION -->
+
+    <script src="../js/location.js"></script>
+
+
+    <!-- NEARBY MANDI LOGIC -->
+
+    <script src="../js/nearby.js"></script>
+
+
+    <!-- =====================================================
+         PAGE INITIALIZATION
+         ===================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            async function () {
+
+                console.log(
+                    "[Nearby Page] Initializing..."
+                );
+
+
+                /*
+                 * Initialize Nearby service.
+                 */
+
+                if (
+                    window.MandiPlusNearby &&
+                    typeof
+                    window.MandiPlusNearby.initialize ===
+                    "function"
+                ) {
+
+                    await
+                        window.MandiPlusNearby.initialize();
+
+                } else {
+
+                    console.error(
+                        "[Nearby Page] MandiPlusNearby not found."
+                    );
+
+                }
+
+
+                /*
+                 * Initialize location service.
+                 *
+                 * This is only called if the existing
+                 * location.js exposes the expected API.
+                 */
+
+                if (
+                    window.MandiPlusLocation &&
+                    typeof
+                    window.MandiPlusLocation.initialize ===
+                    "function"
+                ) {
+
+                    await
+                        window.MandiPlusLocation.initialize();
+
+                }
+
+
+                /*
+                 * Commodity selector.
+                 *
+                 * The existing nearby.js listens for:
+                 *
+                 * mandiplus:commodity-selected
+                 *
+                 * Therefore we dispatch the same event
+                 * when the user changes the selector.
+                 */
+
+                const commoditySelect =
+                    document.getElementById(
+                        "nearbyCommodity"
+                    );
+
+
+                if (commoditySelect) {
+
+                    commoditySelect.addEventListener(
+                        "change",
+                        function () {
+
+                            const commodity =
+                                this.value;
+
+
+                            /*
+                             * Update visible heading.
+                             */
+
+                            const heading =
+                                document.getElementById(
+                                    "nearbyCommodityName"
+                                );
+
+
+                            if (heading) {
+
+                                heading.textContent =
+                                    commodity;
+
+                            }
+
+
+                            /*
+                             * Update supporting text.
+                             */
+
+                            const text =
+                                document.getElementById(
+                                    "nearbyCommodityText"
+                                );
+
+
+                            if (text) {
+
+                                text.textContent =
+                                    commodity;
+
+                            }
+
+
+                            /*
+                             * Notify Nearby JS.
+                             */
+
+                            document.dispatchEvent(
+                                new CustomEvent(
+                                    "mandiplus:commodity-selected",
+                                    {
+                                        detail: {
+                                            commodity:
+                                                commodity
+                                        }
+                                    }
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                console.log(
+                    "[Nearby Page] Initialization complete."
+                );
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

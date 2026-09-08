@@ -393,3 +393,102 @@ def transform_data(df):
     logger.info("=" * 60)
 
     return df
+
+# ============================================================
+# STANDALONE EXECUTION
+# ============================================================
+
+if __name__ == "__main__":
+
+    from extract import extract_data
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(message)s"
+    )
+
+    print("\n" + "=" * 60)
+    print("🚀 MandiPlus Transformation Started")
+    print("=" * 60)
+
+    try:
+
+        # ----------------------------------------------------
+        # 1. Extract raw data
+        # ----------------------------------------------------
+
+        raw_df = extract_data()
+
+        # ----------------------------------------------------
+        # 2. Transform and validate data
+        # ----------------------------------------------------
+
+        transformed_df = transform_data(raw_df)
+
+        # ----------------------------------------------------
+        # 3. Display final result
+        # ----------------------------------------------------
+
+        print("\n" + "=" * 60)
+        print("✅ TRANSFORMATION COMPLETED")
+        print("=" * 60)
+
+        print(f"Total records: {len(transformed_df)}")
+        print(
+            f"Commodities: "
+            f"{transformed_df['commodity'].nunique()}"
+        )
+        print(
+            f"Markets: "
+            f"{transformed_df['market'].nunique()}"
+        )
+
+        print("\n📊 Commodity summary:")
+        print(
+            transformed_df
+            .groupby("commodity")
+            .size()
+            .reset_index(name="records")
+            .to_string(index=False)
+        )
+
+        print("\n📅 Date range:")
+        print(
+            f"From: {transformed_df['arrival_date'].min()}"
+        )
+        print(
+            f"To:   {transformed_df['arrival_date'].max()}"
+        )
+
+        print("\n💰 Price sample:")
+        print(
+            transformed_df[
+                [
+                    "market",
+                    "commodity",
+                    "variety",
+                    "arrival_date",
+                    "min_price",
+                    "max_price",
+                    "modal_price"
+                ]
+            ]
+            .head(10)
+            .to_string(index=False)
+        )
+
+        print("\n" + "=" * 60)
+
+    except Exception as e:
+
+        logger.exception(
+            "Transformation pipeline failed"
+        )
+
+        print("\n" + "=" * 60)
+        print("❌ TRANSFORMATION FAILED")
+        print("=" * 60)
+        print(f"Error: {e}")
+        print("=" * 60)
+
+        raise
